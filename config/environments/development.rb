@@ -24,6 +24,7 @@ require 'tmpdir'
 
 require './wrappers/crow'
 require './wrappers/here'
+require './wrappers/here8'
 require './wrappers/osrm'
 require './wrappers/otp'
 
@@ -69,6 +70,7 @@ module RouterWrapper
 
   HERE_TRUCK = Wrappers::Here.new(CACHE, app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'truck')
   HERE_CAR = Wrappers::Here.new(CACHE, app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'car')
+  HERE8_CAR = Wrappers::Here8.new(CACHE, apikey: ENV['HERE8_APIKEY'], mode: 'car')
 
   PARAMS_LIMIT = { locations: 1_000_000 }.freeze
 
@@ -88,12 +90,14 @@ module RouterWrapper
         route_default: :osrm,
         params_limit: PARAMS_LIMIT,
         quotas: QUOTAS, # Only taken into account if REDIS_COUNT
+        route_default: :osrm5,
         route: {
           osrm: [OSRM],
           crow: [CROW],
           otp: [OTP_BORDEAUX],
           truck: [HERE_TRUCK],
           here_car: [HERE_CAR],
+          here8: [HERE8_CAR],
         },
         matrix: {
           crow: [CROW],
@@ -101,6 +105,7 @@ module RouterWrapper
           otp: [OTP_BORDEAUX],
           truck: [HERE_TRUCK],
           here_car: [HERE_CAR],
+          here8: [HERE8_CAR],
         },
         isoline: {
           crow: [CROW],
@@ -108,6 +113,7 @@ module RouterWrapper
           otp: [OTP_BORDEAUX],
           truck: [HERE_TRUCK],
           here_car: [HERE_CAR],
+          here8: [HERE8_CAR],
         }
       }
     },

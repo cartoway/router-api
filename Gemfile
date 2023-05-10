@@ -37,6 +37,7 @@ end
 
 gem 'dotenv'
 gem 'polylines'
+# gem 'flexible_polyline' # Require at least ruby 2.6. Gem code copied as flexible_polyline.rb to be removed.
 
 group :development, :production do
   gem 'redis'

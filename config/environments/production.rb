@@ -24,6 +24,7 @@ require './wrappers/crow'
 require './wrappers/osrm'
 require './wrappers/otp'
 require './wrappers/here'
+require './wrappers/here8'
 
 require './lib/cache_manager'
 
@@ -39,6 +40,7 @@ module RouterWrapper
   HERE_APP_ID = nil
   HERE_APP_CODE = nil
   HERE_TRUCK = Wrappers::Here.new(CACHE, app_id: HERE_APP_ID, app_code: HERE_APP_CODE, mode: 'truck')
+  HERE8_CAR = Wrappers::Here8.new(CACHE, apikey: ENV['HERE8_APIKEY'], mode: 'car')
 
   PARAMS_LIMIT = { locations: 1000 }.freeze
   REDIS_COUNT = ENV['REDIS_COUNT_HOST'] && Redis.new(host: ENV['REDIS_COUNT_HOST'])
@@ -74,15 +76,18 @@ module RouterWrapper
           osrm: [OSRM_CAR_ICELAND, OSRM],
           otp: [OTP_BORDEAUX],
           here: [HERE_TRUCK],
+          here8: [HERE8_CAR],
         },
         matrix: {
           osrm: [OSRM_CAR_ICELAND, OSRM],
           otp: [OTP_BORDEAUX],
           here: [HERE_TRUCK],
+          here8: [HERE8_CAR],
         },
         isoline: {
           osrm: [OSRM_CAR_ICELAND, OSRM],
           otp: [OTP_BORDEAUX],
+          here8: [HERE8_CAR],
         }
       }
     },
