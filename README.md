@@ -1,4 +1,4 @@
-Router Wrapper
+Router API
 ================
 Offers an unified API for multiple routers based on countries distribution and other parameters like means of transport.
 Build in Ruby with a [Grape](https://github.com/intridea/grape) REST [swagger](http://swagger.io/) API compatible with [geocodejson-spec](https://github.com/yohanboniface/geocodejson-spec).
@@ -7,7 +7,7 @@ Installation
 ============
 
 Install package containing ogr2ogr exec from system package (GDAL).
-In router-wrapper as root directory:
+In router-api as root directory:
 
 ```
 bundle install
@@ -24,12 +24,12 @@ Running
 =======
 
 ```
-bundle exec rackup [-o 0.0.0.0] [-p 4899]
+bundler exec puma -v -p 4899 --pidfile 'tmp/server.pid'
 ```
 
 And in production mode:
 ```
-APP_ENV=production bundle exec rackup [-o 0.0.0.0] [-p 4899]
+APP_ENV=production bundle exec puma -v -p 4899 --pidfile 'tmp/server.pid'
 ```
 
 Available production extra environment variables are:
@@ -50,7 +50,7 @@ docker-compose build
 
 Build and launch containers
 ```
-docker-compose -p router up -d
+docker-compose up -d
 ```
 
 Launch server
