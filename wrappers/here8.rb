@@ -17,7 +17,7 @@
 # <http://www.gnu.org/licenses/agpl.html>
 #
 require './wrappers/wrapper'
-require './lib/flexible_polyline'
+require 'flexible_polyline'
 
 module Wrappers
   class Here8 < Wrapper

@@ -187,6 +187,7 @@ DEPENDENCIES
   byebug
   dotenv
   fakeredis
+  flexible_polyline
   grape
   grape-entity
   grape-swagger

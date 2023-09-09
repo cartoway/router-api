@@ -36,8 +36,8 @@ group :development, :test do
 end
 
 gem 'dotenv'
+gem 'flexible_polyline'
 gem 'polylines'
-# gem 'flexible_polyline' # Require at least ruby 2.6. Gem code copied as flexible_polyline.rb to be removed.
 
 group :development, :production do
   gem 'redis', '< 5' # redis-store is buggy with redis 5 https://github.com/redis-store/redis-store/issues/358
