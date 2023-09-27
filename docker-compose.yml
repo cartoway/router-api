@@ -1,17 +1,16 @@
 version: '3.3'
 services:
   api:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
+    build: .
+    image: router-api:${CARTOROUTE_VERSION:-latest}
     ports:
       - "8082:80" # HOST:CONTAINER, edit only HOST part
     volumes:
-      - ..:/srv/app
-      - ./access.rb:/srv/app/config/access.rb
-      - ./production.rb:/srv/app/config/environments/production.rb
-      - ./production.rb:/srv/app/config/environments/development.rb
-      - ./poly:/srv/app/poly
+      - .:/srv/app
+      - ./docker/access.rb:/srv/app/config/access.rb
+      - ./docker/production.rb:/srv/app/config/environments/production.rb
+      - ./docker/production.rb:/srv/app/config/environments/development.rb
+      - ./docker/poly:/srv/app/poly
     links:
       - redis-cache
       - redis-count
@@ -25,22 +24,22 @@ services:
 
   otp-bordeaux:
     build:
-      context: otp
+      context: docker/otp
     environment:
       GRAPH: bordeaux
     ports:
       - "7001:7000"
     volumes:
-      - ./otp/data:/srv/otp/data
+      - ./docker/otp/data:/srv/otp/data
     restart: unless-stopped
 
   osrm-car-iceland:
     build:
-      context: osrm
+      context: docker/osrm
     environment:
       BASENAME: car-iceland
     volumes:
-      - ./osrm/data:/srv/osrm/data
+      - ./docker/osrm/data:/srv/osrm/data
       - /dev/log:/dev/log
     restart: unless-stopped
 
@@ -52,6 +51,6 @@ services:
   redis-count:
     image: redis:${REDIS_VERSION:-7-alpine}
     volumes:
-      - ./data-count:/data
+      - ./docker/redis-count:/data
     command: redis-server --appendonly yes
     restart: unless-stopped

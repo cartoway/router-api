@@ -1,5 +1,6 @@
 .git
-docker
-!docker/snippets
-!docker/webapp.conf
+/docker/redis*
+/docker/osrm/data
+/docker/otp/data
+/docker/production.rb
 tmp
