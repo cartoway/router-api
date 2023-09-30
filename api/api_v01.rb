@@ -92,11 +92,11 @@ The API supports several return formats: `geojson`, `json` and `xml` which depen
 
 ### Routing
 
-[Find your route on a map](http://router.mapotempo.com/route.html)
+[Find your route on a map](/route.html)
 
 ### Isolines
 
-[Build your isoline on a map](http://router.mapotempo.com/isoline.html)'
+[Build your isoline on a map](/isoline.html)'
       }
     )
   end

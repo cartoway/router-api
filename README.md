@@ -73,9 +73,9 @@ Usage
 =====
 
 The API is defined in Swagger format at
-http://localhost:4899/swagger_doc
+http://localhost:4899/0.1/swagger_doc
 and can be tested with Swagger-UI
-http://swagger.mapotempo.com/?url=http://router.mapotempo.com/swagger_doc
+https://petstore.swagger.io/?url=https://localhost:4899/0.1/swagger_doc
 
 Capability
 -----------------

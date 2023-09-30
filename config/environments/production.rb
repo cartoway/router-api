@@ -47,9 +47,7 @@ module RouterWrapper
   QUOTAS = [{ daily: 100000, monthly: 1000000 }].freeze # Only taken into account if REDIS_COUNT
 
   @@c = {
-    product_title: 'Router Wrapper API',
-    product_contact_email: 'tech@mapotempo.com',
-    product_contact_url: 'https://github.com/Mapotempo/router-wrapper',
+    product_title: 'Router API',
     access_by_api_key: {
       file: './config/access.rb'
     },
