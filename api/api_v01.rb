@@ -59,7 +59,7 @@ module Api
         contact_email: ::RouterWrapper::config[:product_contact_email],
         contact_url: ::RouterWrapper::config[:product_contact_url],
         license: 'GNU Affero General Public License 3',
-        license_url: 'https://raw.githubusercontent.com/Mapotempo/router-wrapper/master/LICENSE',
+        license_url: 'https://raw.githubusercontent.com/cartoroute/router-api/master/LICENSE',
         description: '
 ## Technical access
 
