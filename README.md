@@ -250,3 +250,50 @@ cd docker/otp
 ```
 
 The script will build `bordeaux` graph from `./otp/data/graphs` in `/srv/docker`
+
+## OSRM
+### Load the landuse database from "Corine Land Cover"
+Download GeoPackage from [Copernicus](https://land.copernicus.eu/pan-european/corine-land-cover/clc2018?tab=download) into the `landuses` directory. Double unzip.
+
+Convert the data
+```bash
+ogr2ogr -sql "SELECT * FROM (SELECT CASE CODE_18 WHEN 111 THEN 1 WHEN 112 THEN 2 WHEN 121 THEN 2 WHEN 123 THEN 2 WHEN 124 THEN 2 WHEN 511 THEN 5 WHEN 512 THEN 5 END AS code, Shape FROM U2018_CLC2018_V2020_20u1) AS t WHERE code is NOT NULL" -t_srs EPSG:4326 urban.shp U2018_CLC2018_V2020_20u1.gpkg
+```
+
+Load the data
+```bash
+docker-compose -f docker-compose-tools.yml up -d postgis
+docker-compose -f docker-compose-tools.yml exec postgis bash -c "\\
+    apt update && apt install -y postgis && \\
+    psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} -c 'DROP TABLE IF EXISTS urban;' && \\
+    shp2pgsql /landuses/urban.shp | psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} && \\
+    psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} -c '
+        ALTER TABLE urban ALTER COLUMN geom TYPE geometry(MultiPolygon, 4326);
+        CREATE INDEX urban_idx_geom ON urban USING gist(geom);
+    '
+"
+```
+
+Or empty table for test puspose
+```sql
+CREATE TABLE "urban" (gid serial, "code" int4);
+ALTER TABLE "urban" ADD PRIMARY KEY (gid);
+SELECT AddGeometryColumn('','urban','geom','0','MULTIPOLYGON',2);
+INSERT INTO "urban" ("code",geom) VALUES ('1','');
+ALTER TABLE urban ALTER COLUMN geom TYPE geometry(MultiPolygon, 4326);
+CREATE INDEX urban_idx_geom ON urban USING gist(geom);
+```
+
+### Build the graph
+```
+docker-compose -f docker-compose-tools.yml up -d postgis
+docker-compose -f docker-compose-tools.yml up -d redis-build
+docker-compose run --rm osrm-car-iceland osrm-build.sh
+```
+
+After the build process postgis and redis-build could be stoped
+```
+docker-compose -f docker-compose-tools.yml exec redis-build redis-cli SAVE
+docker-compose -f docker-compose-tools.yml down postgis
+docker-compose -f docker-compose-tools.yml down redis-build
+```
