@@ -70,7 +70,7 @@ module RouterWrapper
 
   HERE_TRUCK = Wrappers::Here.new(CACHE, app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'truck')
   HERE_CAR = Wrappers::Here.new(CACHE, app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'car')
-  HERE8_CAR = Wrappers::Here8.new(CACHE, apikey: ENV['HERE8_APIKEY'], mode: 'car')
+  HERE8_CAR = Wrappers::Here8.new(CACHE, apikey: ENV['HERE8_APIKEY'], mode: 'car', over_400km: false)
 
   PARAMS_LIMIT = { locations: 1_000_000 }.freeze
 

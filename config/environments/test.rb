@@ -64,7 +64,7 @@ module RouterWrapper
   OTP_BORDEAUX = Wrappers::Otp.new(CACHE, url: 'http://localhost:7001', router_id: 'bordeaux', licence: 'ODbL', attribution: 'Bordeaux Métropole', area: 'Bordeaux', crs: 'EPSG:2154')
   HERE_TRUCK = Wrappers::Here.new(CACHE, app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'truck')
   HERE_CAR = Wrappers::Here.new(CACHE, app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'car')
-  HERE8_CAR = Wrappers::Here8.new(CACHE, apikey: ENV['HERE8_APIKEY'], mode: 'car')
+  HERE8_CAR = Wrappers::Here8.new(CACHE, apikey: ENV['HERE8_APIKEY'], mode: 'car', over_400km: false)
 
   PARAMS_LIMIT = { locations: 10000 }.freeze
   REDIS_COUNT = Redis.new # Fake redis

@@ -126,7 +126,7 @@ class Wrappers::Here8Test < Minitest::Test
 
   def test_large_matrix_split
     # activate cache because of large matrix
-    here = Wrappers::Here8.new(ActiveSupport::Cache::FileStore.new(File.join(Dir.tmpdir, 'router'), namespace: 'router', expires_in: 60*10), app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'truck')
+    here = Wrappers::Here8.new(ActiveSupport::Cache::FileStore.new(File.join(Dir.tmpdir, 'router'), namespace: 'router', expires_in: 60*10), apikey: ENV['HERE8_APIKEY'], mode: 'truck', over_400km: false)
     # 101 points inside south-west(50.0,10.0) and north-east(51.0,11.0) (small zone to avoid timeout with here)
     vector = (0..20).collect{ |i|
       [
@@ -175,20 +175,5 @@ class Wrappers::Here8Test < Minitest::Test
     vector = [[49.610710, 18.02], [47.010226, 2.900391]]
 
     assert here.matrix(vector, vector, :time, nil, nil, 'en', hazardous_goods: nil)
-  end
-
-  def test_distance_should_define_row_number
-    [
-      { distance: 100, max_srcs: 15 },
-      { distance: 1_000, max_srcs: 15 },
-      { distance: 1_500, max_srcs: 10 },
-      { distance: 1_700, max_srcs: 8 },
-      { distance: 1_800, max_srcs: 7 },
-      { distance: 1_900, max_srcs: 6 },
-      { distance: 2_000, max_srcs: 5 },
-      { distance: 3_000, max_srcs: 1 }
-    ].each do |obj|
-      assert_equal(RouterWrapper::HERE8_CAR.send(:max_srcs, obj[:distance]), obj[:max_srcs])
-    end
   end
 end

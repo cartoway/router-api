@@ -30,6 +30,7 @@ module Wrappers
       @url_tce = 'https://tce.api.here.com'
       @apikey = hash[:apikey]
       @mode = hash[:mode]
+      @over_400km = hash[:over_400km]
     end
 
     # Declare available router options for capability operation
@@ -172,24 +173,24 @@ module Wrappers
       result = @cache.read(key)
       if !result
 
-        # From Here "Matrix Routing API Developer's Guide" V7
-        # Recommendations for Splitting Matrixes
-        # The best way to split a matrix request is to split it into parts with only few start positions and many
-        # destinations. The number of the start positions should be between 3 and 15, depending on the size
-        # of the area covered by the matrix. The matrices should be split into requests sufficiently small to
-        # ensure a response time of 60 seconds each. The number of the destinations in one request is limited
-        # to 100.
-
-        # Request should not contain more than 15 starts per request / 100 combinaisons
+        # https://www.here.com/docs/bundle/matrix-routing-api-api-reference/page/index.html#tag/Matrix-Calculation
 
         lats = (srcs + dsts).minmax_by{ |p| p[0] }
         lons = (srcs + dsts).minmax_by{ |p| p[1] }
         dist_km = RouterWrapper::Earth.distance_between(lons[1][1], lats[1][0], lons[0][1], lats[0][0]) / 1000.0
-        dsts_split = dsts_max = [100, dsts.size].min
-        srcs_split = max_srcs(dist_km)
+        if dist_km > 400 and !@over_400km
+          raise LargeDistanceMatrix.new("Points over 400 km not allowed: #{dist_km.round} km.")
+        end
+
+        srcs_split = [dist_km <= 400 ? 500 : 15, dsts.size].min
+        dsts_split = dsts_max = [dist_km <= 400 ? 500 : 100, dsts.size].min
+
+        # Make squared sub matrix to average the submatrix edge size. Reduce pricing cost based on larger hedge size.
+        srcs_split = (dsts.size.to_f / (dsts.size.to_f / srcs_split).ceil).floor
+        dsts_split = (dsts.size.to_f / (dsts.size.to_f / dsts_split).ceil).floor
 
         params = {
-          regionDefinition: { type: 'world' },
+          regionDefinition: { type: dist_km <= 400 ? 'autoCircle' : 'world' },
           routingMode: here_routing_mode(dimension.to_s.split('_').collect(&:to_sym)),
           transportMode: @mode,
           departureTime: !departure_time.nil? ? departure_time : options[:traffic] ? nil : 'any', # At HERE, traffic is default, `any` to disable traffic
@@ -288,6 +289,9 @@ module Wrappers
     #     ret
     #   end
     # end
+
+    class LargeDistanceMatrix < StandardError
+    end
 
     private
 
@@ -456,16 +460,6 @@ module Wrappers
         harmful_to_water: :harmfulToWater,
         other: :other
       }
-    end
-
-    ##
-    # < 1000km: 15, 1500km: 10, 2000km : 5
-    def max_srcs(dist_km)
-      if dist_km <= 1_000
-        15
-      else
-        [25 - (dist_km / 100).floor, 1].max
-      end
     end
   end
 end
