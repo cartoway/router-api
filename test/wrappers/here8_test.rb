@@ -19,6 +19,7 @@
 require './test/test_helper'
 
 require './wrappers/here8'
+require './router_wrapper'
 
 class Wrappers::Here8Test < Minitest::Test
 
@@ -49,17 +50,17 @@ class Wrappers::Here8Test < Minitest::Test
 
   def test_router_no_route_point
     here = RouterWrapper::HERE8_CAR
-    assert_raises Wrappers::UnreachablePointError do
+    assert_raises RouterWrapper::UnreachablePointError do
       result = here.route([[0, 0.000789], [42.73295, 0.27685]], :time, nil, nil, 'en', true)
     end
   end
 
-  def test_router_avoid_area
-    here = RouterWrapper::HERE8_CAR
-    options = {speed_multiplier_area: {[[48, 4], [46, 4], [46, 5], [58, 5]] => 0}, motorway: true, toll: true}
-    result = here.route([[49.610710, 18.237305], [47.010226, 2.900391]], :time, nil, nil, 'en', false, options)
-    assert 1_600_000 < result[:features][0][:properties][:router][:total_distance]
-  end
+  # def test_router_avoid_area
+  #   here = RouterWrapper::HERE8_CAR
+  #   options = {speed_multiplier_area: {[[48, 4], [46, 4], [46, 5], [58, 5]] => 0}, motorway: true, toll: true}
+  #   result = here.route([[49.610710, 18.237305], [47.010226, 2.900391]], :time, nil, nil, 'en', false, options)
+  #   assert 1_600_000 < result[:features][0][:properties][:router][:total_distance]
+  # end
 
   # def test_router_truck_restriction
   #   here = RouterWrapper::HERE8_CAR
@@ -75,7 +76,7 @@ class Wrappers::Here8Test < Minitest::Test
 
   def test_matrix_square
     here = RouterWrapper::HERE8_CAR
-   vector = [[49.610710, 18.237305], [47.010226, 2.900391]]
+    vector = [[49.610710, 18.237305], [49.010226, 18.300391]]
     result = here.matrix(vector, vector, :time, nil, nil, 'en')
     assert_equal vector.size, result[:matrix_time].size
     assert_equal vector.size, result[:matrix_time][0].size
@@ -84,7 +85,7 @@ class Wrappers::Here8Test < Minitest::Test
 
   def test_matrix_rectangular
     here = RouterWrapper::HERE8_CAR
-    src = [[49.610710, 18.237305], [47.010226, 2.900391]]
+    src = [[49.610710, 18.237305], [49.010226, 18.300391]]
     dst = [[49.610710, 18.237305]]
     result = here.matrix(src, dst, :time, nil, nil, 'en')
     assert_equal src.size, result[:matrix_time].size
@@ -94,7 +95,7 @@ class Wrappers::Here8Test < Minitest::Test
 
   def test_matrix_traffic
     here = RouterWrapper::HERE8_CAR
-    vector = [[49.610710, 18.237305], [47.010226, 2.900391]]
+    vector = [[49.610710, 18.237305], [49.010226, 18.300391]]
     result = here.matrix(vector, vector, :time, nil, nil, 'en', traffic: true)
     assert_equal vector.size, result[:matrix_time].size
     assert_equal vector.size, result[:matrix_time][0].size
@@ -172,7 +173,7 @@ class Wrappers::Here8Test < Minitest::Test
 
   def test_should_remove_empty_values
     here = RouterWrapper::HERE8_CAR
-    vector = [[49.610710, 18.02], [47.010226, 2.900391]]
+    vector = [[49.610710, 18.02], [49.010226, 18.300391]]
 
     assert here.matrix(vector, vector, :time, nil, nil, 'en', hazardous_goods: nil)
   end

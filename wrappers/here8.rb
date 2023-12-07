@@ -338,7 +338,7 @@ module Wrappers
               notice['severity'] == 'critical'
             }.collect{ |notice|
               if notice['code'] == 'couldNotMatchOrigin' || notice['code'] == 'couldNotMatchDestination'
-                raise UnreachablePointError
+                raise RouterWrapper::UnreachablePointError.new
               # elsif notice['code'] == 'noRouteFound'
               #   raise RouterWrapper::NoRouteFound
               end
