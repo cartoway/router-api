@@ -1,4 +1,5 @@
 .git
+.env
 /docker/redis*
 /docker/osrm/data
 /docker/osrm/landuses

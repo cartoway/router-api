@@ -47,6 +47,7 @@ build/
 
 # Ignore application configuration
 local.env
+.env
 
 # Redis
 *.aof

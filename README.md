@@ -159,10 +159,13 @@ TBD
 
 ## Docker
 
-Adjust config/environments files.
+Copy and adjust environments files.
+```bash
+cp ./config/environments/production.rb ./docker/
+```
 
 Create a `.env` from `.env.template`, and adapt if required.
-Enable componenents in `COMPOSE_FILE` var. Only required for non external engines.
+Enable components in `COMPOSE_FILE` var. Only required for non external engines.
 
 Build docker images
 ```
