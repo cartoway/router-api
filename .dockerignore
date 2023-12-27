@@ -1,6 +1,8 @@
 .git
 /docker/redis*
 /docker/osrm/data
+/docker/osrm/landuses
+/docker/osrm/profiles
 /docker/otp/data
 /docker/production.rb
 tmp
