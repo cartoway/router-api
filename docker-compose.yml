@@ -13,10 +13,8 @@ services:
       - ./docker/poly:/srv/app/poly
     links:
       - redis-cache
-      - redis-count
     environment:
       REDIS_HOST: redis-cache
-      REDIS_COUNT_HOST: redis-count
       APP_ENV: production # Switch to "development" for more traces
       HERE_APP_ID: ${HERE_APP_ID}
       HERE_APP_CODE: ${HERE_APP_CODE}
@@ -27,11 +25,4 @@ services:
   redis-cache:
     image: redis:${REDIS_VERSION:-7-alpine}
     command: redis-server --save ""
-    restart: unless-stopped
-
-  redis-count:
-    image: redis:${REDIS_VERSION:-7-alpine}
-    volumes:
-      - ./docker/redis-count:/data
-    command: redis-server --appendonly yes
     restart: unless-stopped
