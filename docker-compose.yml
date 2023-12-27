@@ -14,36 +14,14 @@ services:
     links:
       - redis-cache
       - redis-count
-      - osrm-car-iceland
     environment:
       REDIS_HOST: redis-cache
       REDIS_COUNT_HOST: redis-count
       APP_ENV: production # Switch to "development" for more traces
+      HERE_APP_ID: ${HERE_APP_ID}
+      HERE_APP_CODE: ${HERE_APP_CODE}
+      HERE8_APIKEY: ${HERE8_APIKEY}
     command: bundle exec puma -v -p 80 --pidfile 'tmp/server.pid'
-    restart: unless-stopped
-
-  otp-bordeaux:
-    build:
-      context: docker/otp
-    environment:
-      GRAPH: bordeaux
-    ports:
-      - "7001:7000"
-    volumes:
-      - ./docker/otp/data:/srv/otp/data
-    restart: unless-stopped
-
-  osrm-car-iceland:
-    build:
-      context: docker/osrm
-    environment:
-      BASENAME: car-iceland
-      PBF_URL: http://download.geofabrik.de/europe/iceland-latest.osm.pbf
-      PROFILE: /srv/osrm/profiles/car/car.lua
-    volumes:
-      - ./docker/osrm/data:/srv/osrm/data
-      - ./docker/osrm/profiles:/srv/osrm/profiles
-      - /dev/log:/dev/log
     restart: unless-stopped
 
   redis-cache:
