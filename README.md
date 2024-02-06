@@ -240,7 +240,7 @@ Or empty table for test purpose
 CREATE TABLE "urban" (gid serial, "code" int4);
 ALTER TABLE "urban" ADD PRIMARY KEY (gid);
 SELECT AddGeometryColumn('','urban','geom','0','MULTIPOLYGON',2);
-INSERT INTO "urban" ("code",geom) VALUES ('1','');
+INSERT INTO "urban" ("code",geom) VALUES ('1',NULL);
 ALTER TABLE urban ALTER COLUMN geom TYPE geometry(MultiPolygon, 4326);
 CREATE INDEX urban_idx_geom ON urban USING gist(geom);
 ```
