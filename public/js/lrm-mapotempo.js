@@ -324,7 +324,8 @@ if (typeof module !== undefined) module.exports = polyline;
       return this.options.serviceUrl + '/route.geojson?api_key=' + this.options.apiKey +
         '&mode=' + this.options.mode + '&dimension=' + this.options.dimension +
         '&track=' + this.options.track + '&motorway=' + this.options.motorway +
-        '&toll=' + this.options.toll +
+        '&toll=' + this.options.toll + '&low_emission_zone=' + this.options.low_emission_zone +
+        '&large_light_vehicle=' + this.options.large_light_vehicle +
         '&geometry=true&loc=' + locs.join(',')
     }
   });

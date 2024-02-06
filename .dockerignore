@@ -4,6 +4,7 @@
 /docker/osrm/data
 /docker/osrm/landuses
 /docker/osrm/profiles
+/docker/osrm/*.geojson
 /docker/otp/data
 /docker/production.rb
 tmp

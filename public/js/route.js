@@ -26,6 +26,14 @@ function init(data) {
     return $('#toll').is(':checked');
   }
 
+  function getLowEmissionZone() {
+    return $('#low_emission_zone').is(':checked');
+  }
+
+  function getLargeLightVehicle() {
+    return $('#large_light_vehicle').is(':checked');
+  }
+
   function resetMap() {
     map.removeControl(routing);
   }
@@ -37,7 +45,9 @@ function init(data) {
         dimension: getDimension(),
         track: getTrack(),
         motorway: getMotorway(),
-        toll: getToll()
+        toll: getToll(),
+        low_emission_zone: getLowEmissionZone(),
+        large_light_vehicle: getLargeLightVehicle(),
       })),
       waypoints: waypoints,
       routeWhileDragging: true

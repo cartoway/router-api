@@ -245,6 +245,10 @@ ALTER TABLE urban ALTER COLUMN geom TYPE geometry(MultiPolygon, 4326);
 CREATE INDEX urban_idx_geom ON urban USING gist(geom);
 ```
 
+#### Generate Low Emission Zone GeoJSON
+
+Add the file at `docker/osrm/low_emission_zone.geojson`.
+
 #### Build the graph
 ```
 docker-compose -f docker-compose-tools.yml up -d postgis
