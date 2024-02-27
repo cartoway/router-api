@@ -236,13 +236,17 @@ docker-compose -f docker-compose-tools.yml exec postgis bash -c "\\
 ```
 
 Or empty table for test purpose
-```sql
-CREATE TABLE "urban" (gid serial, "code" int4);
-ALTER TABLE "urban" ADD PRIMARY KEY (gid);
-SELECT AddGeometryColumn('','urban','geom','0','MULTIPOLYGON',2);
-INSERT INTO "urban" ("code",geom) VALUES ('1',NULL);
-ALTER TABLE urban ALTER COLUMN geom TYPE geometry(MultiPolygon, 4326);
-CREATE INDEX urban_idx_geom ON urban USING gist(geom);
+```bash
+docker-compose -f docker-compose-tools.yml exec postgis bash -c "\\
+  psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} -c \"
+    CREATE TABLE urban (gid serial, code int4);
+    ALTER TABLE urban ADD PRIMARY KEY (gid);
+    SELECT AddGeometryColumn('','urban','geom','0','MULTIPOLYGON',2);
+    INSERT INTO urban (code,geom) VALUES ('1',NULL);
+    ALTER TABLE urban ALTER COLUMN geom TYPE geometry(MultiPolygon, 4326);
+    CREATE INDEX urban_idx_geom ON urban USING gist(geom);
+  \"
+"
 ```
 
 #### Generate Low Emission Zone GeoJSON
