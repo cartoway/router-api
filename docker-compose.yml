@@ -11,7 +11,7 @@ services:
       - ./docker/production.rb:/srv/app/config/environments/production.rb
       - ./docker/production.rb:/srv/app/config/environments/development.rb
       - ./docker/poly:/srv/app/poly
-    links:
+    depends_on:
       - redis-cache
     environment:
       REDIS_HOST: redis-cache

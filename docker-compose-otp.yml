@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   api:
-    links:
+    depends_on:
       - otp-bordeaux
 
   otp-bordeaux:
