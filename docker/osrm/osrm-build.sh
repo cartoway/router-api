@@ -36,8 +36,16 @@ osrm-extract \
     --with-osm-metadata \
     -p ${PROFILE} \
     /srv/osrm/data/${BASENAME_PBF_DATE}
-osrm-contract \
-    /srv/osrm/data/${BASENAME_PBF_DATE%.osm.pbf}.osrm
+
+if [ "$ALGORITHM" == "ch" ]; then
+    osrm-contract \
+        /srv/osrm/data/${BASENAME_PBF_DATE%.osm.pbf}.osrm
+else
+    osrm-partition \
+        /srv/osrm/data/${BASENAME_PBF_DATE%.osm.pbf}.osrm
+    osrm-customize \
+        /srv/osrm/data/${BASENAME_PBF_DATE%.osm.pbf}.osrm
+fi
 
 rm -fr /srv/osrm/data/${BASENAME_PBF_LATEST%.osm.pbf}.osrm.timestamp
 ln -s ${BASENAME_PBF_DATE%.osm.pbf}.osrm.timestamp /srv/osrm/data/${BASENAME_PBF_LATEST%.osm.pbf}.osrm.timestamp

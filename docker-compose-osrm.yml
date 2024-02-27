@@ -11,6 +11,7 @@ services:
       BASENAME: car-iceland
       PBF_URL: http://download.geofabrik.de/europe/iceland-latest.osm.pbf
       PROFILE: /srv/osrm/profiles/car/car.lua
+      ALGORITHM: ch # "ch" or "mld"
     volumes:
       - ./docker/osrm/data:/srv/osrm/data
       - ./docker/osrm/profiles:/srv/osrm/profiles

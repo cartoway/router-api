@@ -138,3 +138,6 @@ ENV REGION ""
 
 # Define entry point
 CMD [ "/usr/bin/osrm-start.sh" ]
+
+# Monkey patch of isochrone
+RUN sed -i "s/true, distance_table:/true, algorithm: argv['algorithm'], distance_table:/" node_modules/osrm-isochrone-server/server.js
