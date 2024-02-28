@@ -56,6 +56,7 @@ module Wrappers
       @area_mapping = hash[:area_mapping] || {}
       @whitelist_classes = hash[:whitelist_classes] || []
       @with_summed_by_area = hash[:with_summed_by_area] || false
+      @exclude = hash[:exclude] || []
     end
 
     # Declare available router options for capability operation
@@ -111,13 +112,13 @@ module Wrappers
           continue_straight: false,
           generate_hints: false,
           approaches: options[:approach] == :curb ? (['curb'] * locs.size).join(';') : nil,
-          exclude: [
+          exclude: (@exclude + [
             toll? && options[:toll] == false ? 'toll' : nil,
             motorway? && options[:motorway] == false ? 'motorway' : nil,
             track? && options[:track] == false ? 'track' : nil,
             low_emission_zone? && options[:low_emission_zone] == false ? 'lowEmissionZone' : nil,
             large_light_vehicle? && options[:large_light_vehicle] == false ? 'notForLargeVehicule' : nil,
-          ].compact.join(','),
+          ].compact).join(','),
         }.delete_if { |k, v| v.nil? || v == '' }
         coordinates = locs.collect{ |loc| ['%f' % loc[1], '%f' % loc[0]].join(',') }.join(';')
         request = RestClient::Request.execute(
@@ -195,7 +196,7 @@ module Wrappers
       if !json
         concern = {
           annotations: ([[dim1, dim2].include?(:time) ? 'duration' : nil] + [[dim1, dim2].include?(:distance) ? 'distance' : nil]).compact.join(','),
-          exclude: [options[:toll] == false ? 'toll' : nil, options[:motorway] == false ? 'motorway' : nil, options[:track] == false ? 'track' : nil, options[:large_light_vehicle] == false ? 'notForLargeVehicule' : nil, options[:low_emission_zone] == false ? 'lowEmissionZone' : nil].compact.join(',')
+          exclude: (@exclude + [options[:toll] == false ? 'toll' : nil, options[:motorway] == false ? 'motorway' : nil, options[:track] == false ? 'track' : nil, options[:large_light_vehicle] == false ? 'notForLargeVehicule' : nil, options[:low_emission_zone] == false ? 'lowEmissionZone' : nil].compact).join(',')
         }
 
         if srcs == dsts
@@ -274,7 +275,7 @@ module Wrappers
           time: dimension == :time ? (size * (options[:speed_multiplier] || 1)).round(1) : nil,
           distance: dimension == :distance ? size : nil,
           approaches: options[:approach] == :curb ? (['curb'] * loc.size).join(';') : nil,
-          exclude: [options[:toll] == false ? 'toll' : nil, options[:motorway] == false ? 'motorway' : nil, options[:track] == false ? 'track' : nil, options[:large_light_vehicle] == false ? 'notForLargeVehicule' : nil, options[:low_emission_zone] == false ? 'lowEmissionZone' : nil].compact.join(','),
+          exclude: (@exclude + [options[:toll] == false ? 'toll' : nil, options[:motorway] == false ? 'motorway' : nil, options[:track] == false ? 'track' : nil, options[:large_light_vehicle] == false ? 'notForLargeVehicule' : nil, options[:low_emission_zone] == false ? 'lowEmissionZone' : nil].compact).join(','),
         }.delete_if { |k, v| v.nil? || v == '' }
         begin
           request = RestClient::Request.execute(
