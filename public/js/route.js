@@ -14,10 +14,6 @@ function init(data) {
     return $('#router-dimension').val();
   }
 
-  function getTrack() {
-    return $('#track').is(':checked');
-  }
-
   function getMotorway() {
     return $('#motorway').is(':checked');
   }
@@ -30,10 +26,6 @@ function init(data) {
     return $('#low_emission_zone').is(':checked');
   }
 
-  function getLargeLightVehicle() {
-    return $('#large_light_vehicle').is(':checked');
-  }
-
   function resetMap() {
     map.removeControl(routing);
   }
@@ -43,11 +35,9 @@ function init(data) {
       router: L.Routing.mt($.extend(options, {
         mode: getMode(),
         dimension: getDimension(),
-        track: getTrack(),
         motorway: getMotorway(),
         toll: getToll(),
         low_emission_zone: getLowEmissionZone(),
-        large_light_vehicle: getLargeLightVehicle(),
       })),
       waypoints: waypoints,
       routeWhileDragging: true
