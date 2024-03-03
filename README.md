@@ -213,7 +213,38 @@ cd docker/otp
 The script will build `bordeaux` graph from `./otp/data/graphs` in `/srv/docker`
 
 ### OSRM
-#### Load the landuse database from "Corine Land Cover"
+#### Init landuse database
+```bash
+docker-compose -f docker-compose-tools.yml exec postgis bash -c "\\
+  psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} -c \"
+    CREATE TABLE urban (gid serial, code int4);
+    ALTER TABLE urban ADD PRIMARY KEY (gid);
+    SELECT AddGeometryColumn('','urban','geom','0','MULTIPOLYGON',2);
+    ALTER TABLE urban ALTER COLUMN geom TYPE geometry(MultiPolygon, 4326);
+    CREATE INDEX urban_idx_geom ON urban USING gist(geom);
+  \"
+"
+```
+
+Load a shapefile. See below how to get shapefile.
+```bash
+docker-compose -f docker-compose-tools.yml up -d postgis
+docker-compose -f docker-compose-tools.yml exec postgis bash -c "\\
+    apt update && apt install -y postgis && \\
+    shp2pgsql -a /landuses/urban.shp | psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} \\
+"
+```
+
+Alternatively, for test purpose only, add just one record into the table
+```bash
+docker-compose -f docker-compose-tools.yml exec postgis bash -c "\\
+  psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} -c \"
+    INSERT INTO urban (code, geom) VALUES ('1', NULL);
+  \"
+"
+```
+
+#### Landuse database from "Corine Land Cover"
 Download GeoPackage from [Copernicus](https://land.copernicus.eu/pan-european/corine-land-cover/clc2018?tab=download) into the `landuses` directory. Double unzip.
 
 Convert the data
@@ -221,32 +252,36 @@ Convert the data
 ogr2ogr -sql "SELECT * FROM (SELECT CASE CODE_18 WHEN 111 THEN 1 WHEN 112 THEN 2 WHEN 121 THEN 2 WHEN 123 THEN 2 WHEN 124 THEN 2 WHEN 511 THEN 5 WHEN 512 THEN 5 END AS code, Shape FROM U2018_CLC2018_V2020_20u1) AS t WHERE code is NOT NULL" -t_srs EPSG:4326 urban.shp U2018_CLC2018_V2020_20u1.gpkg
 ```
 
-Load the data
-```bash
-docker-compose -f docker-compose-tools.yml up -d postgis
-docker-compose -f docker-compose-tools.yml exec postgis bash -c "\\
-    apt update && apt install -y postgis && \\
-    psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} -c 'DROP TABLE IF EXISTS urban;' && \\
-    shp2pgsql /landuses/urban.shp | psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} && \\
-    psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} -c '
-        ALTER TABLE urban ALTER COLUMN geom TYPE geometry(MultiPolygon, 4326);
-        CREATE INDEX urban_idx_geom ON urban USING gist(geom);
-    '
-"
-```
+### Landuse database from OSM
+Download an .osm.pbf file. Eg. with Morocco
 
-Or empty table for test purpose
 ```bash
-docker-compose -f docker-compose-tools.yml exec postgis bash -c "\\
-  psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} -c \"
-    CREATE TABLE urban (gid serial, code int4);
-    ALTER TABLE urban ADD PRIMARY KEY (gid);
-    SELECT AddGeometryColumn('','urban','geom','0','MULTIPOLYGON',2);
-    INSERT INTO urban (code,geom) VALUES ('1',NULL);
-    ALTER TABLE urban ALTER COLUMN geom TYPE geometry(MultiPolygon, 4326);
-    CREATE INDEX urban_idx_geom ON urban USING gist(geom);
-  \"
-"
+osmium \
+    tags-filter \
+    --overwrite -o morocco-landuse.osm.pbf \
+    morocco-latest.osm.pbf \
+    wr/landuse=residential,retail,railway,industrial,garages,construction,commercial,cemetery,village_green,religious,education \
+    wr/building!=no
+
+# Use meter unit, eg UTM zone
+ogr2ogr \
+    -t_srs EPSG:32629 \
+    morocco-landuse.gpkg \
+    morocco-landuse.osm.pbf \
+    multipolygons
+
+# Over simply approach, but it works
+ogr2ogr \
+    morocco-landuse-union.gpkg \
+    -dialect spatialite -sql 'SELECT ST_Union(ST_Buffer(geom, CASE WHEN landuse IS NOT NULL THEN 100 ELSE 50 END, 1)) AS geom FROM multipolygons' \
+    -explodecollections \
+    morocco-landuse.gpkg
+ogr2ogr \
+    -t_srs EPSG:4326 \
+    morocco-urnan.shp \
+    -dialect spatialite -sql 'SELECT 2 AS code, ST_Simplify(geom, 20) AS geom FROM "SELECT" WHERE ST_Area(ST_Simplify(geom, 20)) > 30000' \
+    -explodecollections \
+    morocco-landuse-union.gpkg
 ```
 
 #### Generate Low Emission Zone GeoJSON
