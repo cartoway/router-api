@@ -177,4 +177,28 @@ class Wrappers::Here8Test < Minitest::Test
 
     assert here.matrix(vector, vector, :time, nil, nil, 'en', hazardous_goods: nil)
   end
+
+  def test_route_float_to_integer_params
+    here = RouterWrapper::HERE8_CAR
+    options = { weight: 12.0, weight_per_axle: 5.0, height: 3.8, width: 2.6, length: 17.5 }
+    options_multiplier = { weight: 1000, weight_per_axle: 1000, height: 100, width: 100, length: 100 }
+    equivalent_options = { weight: 'vehicle[grossWeight]', weight_per_axle: 'vehicle[weightPerAxle]', height: 'vehicle[height]', width: 'vehicle[width]', length: 'vehicle[length]'}
+    params = here.build_route_params(:time, nil, nil, 'en', false, options)
+    options.each{ |key, value|
+      assert params[equivalent_options[key].to_sym].is_a? Integer
+      assert_equal value * options_multiplier[key], params[equivalent_options[key].to_sym]
+    }
+  end
+
+  def test_matrix_float_to_integer_params
+    here = RouterWrapper::HERE8_CAR
+    options = { weight: 12.0, weight_per_axle: 5.0, height: 3.8, width: 2.6, length: 17.5 }
+    options_multiplier = { weight: 1000, weight_per_axle: 1000, height: 100, width: 100, length: 100 }
+    equivalent_options = { weight: :grossWeight, weight_per_axle: :weightPerAxle, height: :height, width: :width, length: :length }
+    params = here.build_matrix_params(5, :time, nil, nil, 'en', options)
+    options.each{ |key, value|
+      assert params[:vehicle][equivalent_options[key]].is_a? Integer
+      assert_equal value * options_multiplier[key], params[:vehicle][equivalent_options[key]]
+    }
+  end
 end
