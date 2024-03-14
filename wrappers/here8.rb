@@ -262,7 +262,7 @@ module Wrappers
         transportMode: @mode,
         departureTime: !departure_time.nil? ? departure_time : options[:traffic] ? nil : 'any', # At HERE, traffic is default, `any` to disable traffic
         avoid: {
-          features: here_avoid_features(options),
+          features: here_avoid_features(options).join(','),
           areas: here_avoid_areas(options[:speed_multiplier_area]),
           zoneCategories: options[:low_emission_zone] == false ? 'environmental' : nil,
         }.select { |_, value| !value.blank? },
