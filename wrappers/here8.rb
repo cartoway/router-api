@@ -82,27 +82,7 @@ module Wrappers
 
     def route(locs, dimension, departure_time, arrival_time, lang, with_geometry, options = {})
       # Cache defined inside private get method
-      params = {
-        routingMode: here_routing_mode(dimension.to_s.split('_').collect(&:to_sym)),
-        transportMode: @mode,
-        'avoid[features]': here_avoid_features(options).join(','),
-        departureTime: !departure_time.nil? ? departure_time : options[:traffic] ? nil : 'any', # At HERE, traffic is default, `any` to disable traffic
-        arrivalTime: arrival_time,
-        'avoid[areas]': here_avoid_areas(options[:speed_multiplier_area]),
-        alternatives: 0,
-        lang: lang,
-        'vehicle[type]': @mode == 'truck' ? 'straightTruck' : nil,
-        'vehicle[trailerCount]': options[:trailers], # Truck routing only, number of trailers.
-        'vehicle[grossWeight]': options[:weight] ? options[:weight] * 1000 : nil, # Truck routing only, vehicle weight including trailers and shipped goods, in kg.
-        'vehicle[weightPerAxle]': options[:weight_per_axle] ? options[:weight_per_axle] * 1000 : nil, # Truck routing only, vehicle weight per axle in kg.
-        'vehicle[height]': options[:height] ? options[:height] * 100 : nil, # Truck routing only, vehicle height in centimeters.
-        'vehicle[width]': options[:width] ? options[:width] * 100 : nil, # Truck routing only, vehicle width in centimeters.
-        'vehicle[length]': options[:length] ? options[:length] * 100 : nil, # Truck routing only, vehicle length in centimeters.
-        'vehicle[shippedHazardousGoods]': [here_hazardous_map[options[:hazardous_goods]]].compact, # Truck routing only, list of hazardous materials.
-        #tunnelCategory : # Specifies the tunnel category to restrict certain route links. The route will pass only through tunnels of a les
-        return: ['summary', with_geometry ? 'polyline': nil].compact.join(',')
-        # options[:toll_costs]
-      }.delete_if { |k, v| v.nil? }
+      params = build_route_params(dimension, departure_time, arrival_time, lang, with_geometry, options = {}).delete_if { |k, v| v.nil? }
       params["origin"] = "#{locs[0][0]},#{locs[0][1]}"
       locs.each_with_index.to_a[1..-2].each{ |loc, index|
         raise 'Via point Not implemented'
@@ -189,27 +169,7 @@ module Wrappers
         srcs_split = (dsts.size.to_f / (dsts.size.to_f / srcs_split).ceil).floor
         dsts_split = (dsts.size.to_f / (dsts.size.to_f / dsts_split).ceil).floor
 
-        params = {
-          regionDefinition: { type: dist_km <= 400 ? 'autoCircle' : 'world' },
-          routingMode: here_routing_mode(dimension.to_s.split('_').collect(&:to_sym)),
-          transportMode: @mode,
-          departureTime: !departure_time.nil? ? departure_time : options[:traffic] ? nil : 'any', # At HERE, traffic is default, `any` to disable traffic
-          avoid: {
-            features: here_avoid_features(options),
-            areas: here_avoid_areas(options[:speed_multiplier_area]),
-          }.select { |_, value| !value.nil? },
-          matrixAttributes: dim.collect{ |d| d == :time ? 'travelTimes' : d == :distance ? 'distances' : nil }.compact,
-          vehicle: {
-            type: @mode == 'truck' ? 'straightTruck' : nil,
-            trailerCount: options[:trailers], # Truck routing only, number of trailers.
-            grossWeight: options[:weight] ? options[:weight] * 1000 : nil, # Truck routing only, vehicle weight including trailers and shipped goods, in kg.
-            weightPerAxle: options[:weight_per_axle] ? options[:weight_per_axle] * 1000 : nil, # Truck routing only, vehicle weight per axle in kg.
-            height: options[:height] ? options[:height] * 100 : nil, # Truck routing only, vehicle height in centimeters.
-            width: options[:width] ? options[:width] * 100 : nil, # Truck routing only, vehicle width in centimeters.
-            length: options[:length] ? options[:length] * 100 : nil, # Truck routing only, vehicle length in centimeters.
-            shippedHazardousGoods: [here_hazardous_map[options[:hazardous_goods]]].compact, # Truck routing only, list of hazardous materials.
-          }.select { |_, value| !value.nil? },
-        }
+        params = build_matrix_params(dist_km, dimension, departure_time, arrival_time, lang, options = {})
 
         result = split_matrix(srcs_split, dsts_split, dsts_max, srcs, dsts, params, options[:strict_restriction])
 
@@ -289,6 +249,55 @@ module Wrappers
     #     ret
     #   end
     # end
+
+    def build_matrix_params(dist_km, dimension, departure_time, arrival_time, lang, options = {})
+      dim = dimension.to_s.split('_').collect(&:to_sym)
+      {
+        regionDefinition: { type: dist_km <= 400 ? 'autoCircle' : 'world' },
+        routingMode: here_routing_mode(dimension.to_s.split('_').collect(&:to_sym)),
+        transportMode: @mode,
+        departureTime: !departure_time.nil? ? departure_time : options[:traffic] ? nil : 'any', # At HERE, traffic is default, `any` to disable traffic
+        avoid: {
+          features: here_avoid_features(options),
+          areas: here_avoid_areas(options[:speed_multiplier_area]),
+        }.select { |_, value| !value.nil? },
+        matrixAttributes: dim.collect{ |d| d == :time ? 'travelTimes' : d == :distance ? 'distances' : nil }.compact,
+        vehicle: {
+          type: @mode == 'truck' ? 'straightTruck' : nil,
+          trailerCount: options[:trailers], # Truck routing only, number of trailers.
+          grossWeight: options[:weight] ? (options[:weight] * 1000).to_i : nil, # Truck routing only, vehicle weight including trailers and shipped goods, in kg.
+          weightPerAxle: options[:weight_per_axle] ? (options[:weight_per_axle] * 1000).to_i : nil, # Truck routing only, vehicle weight per axle in kg.
+          height: options[:height] ? (options[:height] * 100).to_i : nil, # Truck routing only, vehicle height in centimeters.
+          width: options[:width] ? (options[:width] * 100).to_i : nil, # Truck routing only, vehicle width in centimeters.
+          length: options[:length] ? (options[:length] * 100).to_i : nil, # Truck routing only, vehicle length in centimeters.
+          shippedHazardousGoods: [here_hazardous_map[options[:hazardous_goods]]].compact, # Truck routing only, list of hazardous materials.
+        }.select { |_, value| !value.nil? }
+      }
+    end
+
+    def build_route_params(dimension, departure_time, arrival_time, lang, with_geometry, options = {})
+      {
+        routingMode: here_routing_mode(dimension.to_s.split('_').collect(&:to_sym)),
+        transportMode: @mode,
+        'avoid[features]': here_avoid_features(options).join(','),
+        departureTime: !departure_time.nil? ? departure_time : options[:traffic] ? nil : 'any', # At HERE, traffic is default, `any` to disable traffic
+        arrivalTime: arrival_time,
+        'avoid[areas]': here_avoid_areas(options[:speed_multiplier_area]),
+        alternatives: 0,
+        lang: lang,
+        'vehicle[type]': @mode == 'truck' ? 'straightTruck' : nil,
+        'vehicle[trailerCount]': options[:trailers].to_i, # Truck routing only, number of trailers.
+        'vehicle[grossWeight]': options[:weight] ? (options[:weight] * 1000).to_i : nil, # Truck routing only, vehicle weight including trailers and shipped goods, in kg.
+        'vehicle[weightPerAxle]': options[:weight_per_axle] ? (options[:weight_per_axle] * 1000).to_i : nil, # Truck routing only, vehicle weight per axle in kg.
+        'vehicle[height]': options[:height] ? (options[:height] * 100).to_i : nil, # Truck routing only, vehicle height in centimeters.
+        'vehicle[width]': options[:width] ? (options[:width] * 100).to_i : nil, # Truck routing only, vehicle width in centimeters.
+        'vehicle[length]': options[:length] ? (options[:length] * 100).to_i : nil, # Truck routing only, vehicle length in centimeters.
+        'vehicle[shippedHazardousGoods]': [here_hazardous_map[options[:hazardous_goods]]].compact, # Truck routing only, list of hazardous materials.
+        #tunnelCategory : # Specifies the tunnel category to restrict certain route links. The route will pass only through tunnels of a les
+        return: ['summary', with_geometry ? 'polyline': nil].compact.join(',')
+        # options[:toll_costs]
+      }
+    end
 
     class LargeDistanceMatrix < StandardError
     end
