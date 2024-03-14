@@ -206,7 +206,10 @@ module Wrappers
     #     rangeType: dimension,
     #     routingMode: here_routing_mode(dimension.to_s.split('_').collect(&:to_sym)),
     #     transportMode: @mode,
-    #     'avoid[features]': here_avoid_features(options).join(','),
+    #     avoid: {
+    #       features: here_avoid_features(options).join(','),
+    #       zoneCategories: options[:low_emission_zone] == false ? 'environmental' : nil,
+    #     }.select { |_, value| !value.blank? },
     #     departureTime: departure_time,
     #     # arrivalTime: arrival_time,
     #     # 'avoid[areas]': here_avoid_areas(options[:speed_multiplier_area]),
@@ -261,7 +264,8 @@ module Wrappers
         avoid: {
           features: here_avoid_features(options),
           areas: here_avoid_areas(options[:speed_multiplier_area]),
-        }.select { |_, value| !value.nil? },
+          zoneCategories: options[:low_emission_zone] == false ? 'environmental' : nil,
+        }.select { |_, value| !value.blank? },
         matrixAttributes: dim.collect{ |d| d == :time ? 'travelTimes' : d == :distance ? 'distances' : nil }.compact,
         vehicle: {
           type: @mode == 'truck' ? 'straightTruck' : nil,
@@ -280,7 +284,10 @@ module Wrappers
       {
         routingMode: here_routing_mode(dimension.to_s.split('_').collect(&:to_sym)),
         transportMode: @mode,
-        'avoid[features]': here_avoid_features(options).join(','),
+        avoid: {
+          features: here_avoid_features(options).join(','),
+          zoneCategories: options[:low_emission_zone] == false ? 'environmental' : nil,
+        }.select { |_, value| !value.blank? },
         departureTime: !departure_time.nil? ? departure_time : options[:traffic] ? nil : 'any', # At HERE, traffic is default, `any` to disable traffic
         arrivalTime: arrival_time,
         'avoid[areas]': here_avoid_areas(options[:speed_multiplier_area]),
