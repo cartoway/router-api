@@ -82,7 +82,8 @@ module Wrappers
 
     def route(locs, dimension, departure_time, arrival_time, lang, with_geometry, options = {})
       # Cache defined inside private get method
-      params = build_route_params(dimension, departure_time, arrival_time, lang, with_geometry, options = {}).delete_if { |k, v| v.nil? }
+      params = build_route_params(dimension, departure_time, arrival_time, lang, with_geometry, options).delete_if { |k, v| v.nil? }
+
       params["origin"] = "#{locs[0][0]},#{locs[0][1]}"
       locs.each_with_index.to_a[1..-2].each{ |loc, index|
         raise 'Via point Not implemented'
@@ -169,7 +170,7 @@ module Wrappers
         srcs_split = (dsts.size.to_f / (dsts.size.to_f / srcs_split).ceil).floor
         dsts_split = (dsts.size.to_f / (dsts.size.to_f / dsts_split).ceil).floor
 
-        params = build_matrix_params(dist_km, dimension, departure_time, arrival_time, lang, options = {})
+        params = build_matrix_params(dist_km, dimension, departure_time, arrival_time, lang, options).delete_if { |k, v| v.nil? }
 
         result = split_matrix(srcs_split, dsts_split, dsts_max, srcs, dsts, params, options[:strict_restriction])
 
