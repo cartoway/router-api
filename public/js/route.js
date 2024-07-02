@@ -42,6 +42,17 @@ function init(data) {
       waypoints: waypoints,
       routeWhileDragging: true
     }).addTo(map);
+
+    var search = new URLSearchParams(window.location.search);
+    (search.get('waypoints') || "").split(';').forEach(function(waypoint, i) {
+      var latlng = waypoint.split(',').reverse();
+      routing.spliceWaypoints(i, 1, latlng);
+    });
+    waypoints = routing.getPlan()._waypoints;
+
+    routing.on('routingstart', function(e) {
+      updateUrl(waypoints);
+    });
   }
 
   function initDimensions(mode) {
@@ -59,6 +70,16 @@ function init(data) {
     if(!routing) {
       initMap();
     }
+  }
+
+  function updateUrl(waypoints) {
+    var url = new URL(window.location.href);
+    url.searchParams.set('waypoints', waypoints
+      .filter((waypoint) => waypoint.latLng)
+      .map((waypoint) => waypoint.latLng.lng + ',' + waypoint.latLng.lat)
+      .join(';')
+    );
+    history.replaceState({}, '', url);
   }
 
   function createButton(label, container) {
