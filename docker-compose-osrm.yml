@@ -9,7 +9,7 @@ services:
       context: docker/osrm
     environment:
       BASENAME: car-iceland
-      PBF_URL: http://download.geofabrik.de/europe/iceland-latest.osm.pbf
+      PBF_URLS: http://download.geofabrik.de/europe/iceland-latest.osm.pbf http://download.geofabrik.de/europe/andorra-latest.osm.pbf
       PROFILE: /srv/osrm/profiles/car/car.lua
       ALGORITHM: ch # "ch" or "mld"
     volumes:

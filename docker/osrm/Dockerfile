@@ -91,7 +91,6 @@ RUN apt update && \
     apt install -y --no-install-recommends \
         lua-sql-postgres \
         lua-redis \
-        osmosis \
         osmium-tool \
         wget \
         curl
