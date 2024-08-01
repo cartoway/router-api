@@ -32,6 +32,7 @@ GEM
       public_suffix (>= 2.0.2, < 6.0)
     ansi (1.5.0)
     ast (2.4.2)
+    bigdecimal (3.1.8)
     border_patrol (0.2.1)
       nokogiri (>= 1.4.3.1)
     builder (3.2.4)
@@ -162,6 +163,9 @@ GEM
       rubocop (>= 0.71.0)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
+    sentry-ruby (5.18.2)
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.0.2)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -210,6 +214,7 @@ DEPENDENCIES
   redis-activesupport
   redis-store
   rest-client
+  sentry-ruby
   simplecov
 
 RUBY VERSION

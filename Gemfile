@@ -21,6 +21,8 @@ gem 'border_patrol'
 gem 'activesupport'
 gem 'actionpack'
 
+gem 'sentry-ruby'
+
 group :test do
   gem 'fakeredis'
   gem 'minitest'
