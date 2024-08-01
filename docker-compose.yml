@@ -19,6 +19,7 @@ services:
       HERE_APP_ID: ${HERE_APP_ID}
       HERE_APP_CODE: ${HERE_APP_CODE}
       HERE8_APIKEY: ${HERE8_APIKEY}
+      SENTRY_DSN: ${SENTRY_DSN}
     command: bundle exec puma -v -p 80 --pidfile 'tmp/server.pid'
     restart: unless-stopped
 
