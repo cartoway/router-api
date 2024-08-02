@@ -32,7 +32,7 @@ end
 
 group :development, :test do
   gem 'byebug'
-  gem 'mapotempo_rubocop', :git => 'https://github.com/Mapotempo/mapotempo_rubocop.git'
+  gem 'rubocop-policy', git: 'https://github.com/cartoway/rubocop-policy'
 end
 
 gem 'dotenv'
