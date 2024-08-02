@@ -41,6 +41,15 @@ module Api
   module V01
     class Api < Grape::API
       before do
+        if params[:api_key]
+          key_print = params[:api_key].rpartition('-')[0]
+          key_print = params[:api_key][0..3] if key_print.empty?
+          if defined?(Sentry)
+            scope.set_tags(key_print: key_print)
+            scope.set_tags(api_key: params[:api_key])
+          end
+        end
+
         if !params || !RouterWrapper.access(true).key?(params[:api_key])
           error!('401 Unauthorized', 401)
         elsif RouterWrapper.access[params[:api_key]][:expire_at]&.to_date&.send(:<, Date.today)
@@ -199,6 +208,7 @@ module Api
                                            end.to_time.to_i }
           rack_response(format_message(response, nil), 429, headers)
         else
+          Sentry.capture_exception(e) if defined?(Sentry)
           rack_response(format_message(response, e.backtrace), 500)
         end
       end
