@@ -15,7 +15,7 @@ services:
       - redis-cache
     environment:
       REDIS_HOST: redis-cache
-      APP_ENV: production # Switch to "development" for more traces
+      APP_ENV: ${APP_ENV:-development}
       HERE_APP_ID: ${HERE_APP_ID}
       HERE_APP_CODE: ${HERE_APP_CODE}
       HERE8_APIKEY: ${HERE8_APIKEY}
