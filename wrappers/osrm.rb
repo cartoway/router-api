@@ -99,7 +99,7 @@ module Wrappers
     def route(locs, dimension, _departure, _arrival, language, with_geometry, options = {})
       options[:format] ||= 'json'
       options[:precision] ||= 5
-      key = [:osrm, :route, Digest::MD5.hexdigest(Marshal.dump([@url_trace[dimension], dimension, with_geometry, locs, language, options.except(:speed_multiplier)]))]
+      key = [:osrm, :route, Digest::MD5.hexdigest(Marshal.dump([@url_trace[dimension], dimension, with_geometry, locs, language, @exclude, options.except(:speed_multiplier)]))]
 
       json = @cache.read(key)
       if !json
@@ -190,7 +190,7 @@ module Wrappers
 
     def matrix(srcs, dsts, dimension, _departure, _arrival, language, options = {})
       dim1, dim2 = dimension.to_s.split('_').collect(&:to_sym)
-      key = [:osrm, :matrix, Digest::MD5.hexdigest(Marshal.dump([@url_matrix[dim1], dim1, dim2, srcs, dsts, options.except(:speed_multiplier)]))]
+      key = [:osrm, :matrix, Digest::MD5.hexdigest(Marshal.dump([@url_matrix[dim1], dim1, dim2, srcs, dsts, @exclude, options.except(:speed_multiplier)]))]
 
       json = @cache.read(key)
       if !json
@@ -266,7 +266,7 @@ module Wrappers
     end
 
     def isoline(loc, dimension, size, _departure, language, options = {})
-      key = [:osrm, :isoline, Digest::MD5.hexdigest(Marshal.dump([@url_isoline[dimension], dimension, loc, size, options]))]
+      key = [:osrm, :isoline, Digest::MD5.hexdigest(Marshal.dump([@url_isoline[dimension], dimension, loc, size, @exclude, options]))]
       request = @cache.read(key)
       if !request
         params = {
