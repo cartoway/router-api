@@ -21,6 +21,8 @@ gem 'i18n'
 gem 'rack-contrib'
 gem 'rest-client'
 
+gem 'ai4r'
+
 gem 'sentry-ruby'
 
 group :test do
