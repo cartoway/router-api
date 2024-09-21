@@ -68,7 +68,7 @@ module RouterWrapper
   HERE8_CAR = Wrappers::Here8.new(CACHE_HERE, apikey: ENV['HERE8_APIKEY'], mode: 'car', over_400km: false)
   GRAPHHOPPER = Wrappers::GraphHopper.new(CACHE, url: 'http://localhost:8989', profile: 'car', licence: 'ODbL', attribution: '© OpenStreetMap contributors')
 
-  APPROXIMATE_MATRIX_CROW = Wrappers::ApproximateMatrix.new(CACHE, CROW, 2)
+  APPROXIMATE_MATRIX_CROW = Wrappers::ApproximateMatrix.new(CACHE, CROW, Ai4r::Clusterers::SingleLinkage, 2)
 
   PARAMS_LIMIT = { locations: 10000 }.freeze
   REDIS_COUNT = Redis.new # Fake redis

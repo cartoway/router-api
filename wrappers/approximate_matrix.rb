@@ -10,8 +10,9 @@ Fixnum = Integer
 
 module Wrappers
   class ApproximateMatrix < Wrapper
-    def initialize(cache, proxified, max_size, hash = {})
+    def initialize(cache, proxified, clusterer, max_size, hash = {})
       @proxified = proxified
+      @clusterer = clusterer
       @max_size = max_size
       super(cache, hash)
     end
@@ -26,8 +27,8 @@ module Wrappers
       end
 
       data_set = Ai4r::Data::DataSet.new(data_items: Array.new(src.size) { |i| [i] })
-      c = Ai4r::Clusterers::BisectingKMeans.new
-      c.set_parameters(max_iterations: 10)
+      c = @clusterer.new
+      c.set_parameters(max_iterations: 1)
       c.distance_function = lambda { |a, b|
         a = a[0]
         b = b[0]

@@ -31,7 +31,8 @@ class Wrappers::CrowTest < Minitest::Test
 
   def test_without_approx_matrix
     crow = RouterWrapper::CROW
-    approx = RouterWrapper::APPROXIMATE_MATRIX_CROW
+    clusterer = Ai4r::Clusterers::SingleLinkage
+    approx = Wrappers::ApproximateMatrix.new(RouterWrapper::CACHE, crow, clusterer, 2) # Max matrix size is 2
 
     ps = [[49.610710, 18.237305], [47.010226, 2.900391]]
     crow_result = crow.matrix(ps, ps, :time, nil, nil, 'en', {motorway: true, toll: true})
@@ -42,9 +43,10 @@ class Wrappers::CrowTest < Minitest::Test
     assert_equal crow_result, approx_result
   end
 
-  def test_approx_matrix
+  def test_small_approx_matrix
     crow = RouterWrapper::CROW
-    approx = RouterWrapper::APPROXIMATE_MATRIX_CROW # Max matrix size is 2
+    clusterer = Ai4r::Clusterers::SingleLinkage
+    approx = Wrappers::ApproximateMatrix.new(RouterWrapper::CACHE, crow, clusterer, 2) # Max matrix size is 2
 
     ps = [[49.610710, 18.237305], [47.010226, 2.900391], [49.7559, 18.9768]]
     crow_result = crow.matrix(ps, ps, :time, nil, nil, 'en', {motorway: true, toll: true})
