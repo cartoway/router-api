@@ -54,11 +54,8 @@ class Wrappers::CrowTest < Minitest::Test
 
     # Points 2 and 3 merged
     d = approx_result[:matrix_time][0][2]
-    crow_result[:matrix_time] = [
-      [0, 0, d],
-      [0, 0, d],
-      [d, d, 0],
-    ]
+    crow_result[:matrix_time][1][2] = d
+    crow_result[:matrix_time][2][1] = d
 
     assert_equal crow_result, approx_result
   end
