@@ -65,6 +65,7 @@ class Wrappers::CrowTest < Minitest::Test
   end
 
   SHOPS_URBAN = [
+    # lat, lon
     [28.095722, -15.457344],
     [28.143829, -15.431295],
     [28.137481, -15.43631],

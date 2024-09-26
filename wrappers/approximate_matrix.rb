@@ -34,7 +34,7 @@ module Wrappers
         b = b[0]
 
         # Math.sqrt((src[a][0] - src[b][0])**2 + (src[a][1] - src[b][1])**2)
-        RouterWrapper::Earth.distance_between(src[a][0], src[a][1], src[b][0], src[b][1])
+        RouterWrapper::Earth.distance_between(src[a][1], src[a][0], src[b][1], src[b][0])
       }
 
       c.build(data_set, @max_size) # Number of cluster
@@ -55,7 +55,7 @@ module Wrappers
 
         # Return the closest point to the centroid
         min_index = cluster.data_items.min_by{ |data_item|
-          RouterWrapper::Earth.distance_between(src[data_item[0]][0], src[data_item[0]][1], centroid[0], centroid[1])
+          RouterWrapper::Earth.distance_between(src[data_item[0]][1], src[data_item[0]][0], centroid[1], centroid[0])
         }
         src[min_index[0]]
       }
