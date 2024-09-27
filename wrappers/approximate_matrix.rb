@@ -15,6 +15,8 @@ module Wrappers
       @clusterer = clusterer
       @max_size = max_size
       super(cache, hash)
+
+      @crow = Wrappers::Crow.new(nil)
     end
 
     def method_missing(method_name, *args)
@@ -62,6 +64,22 @@ module Wrappers
 
       m = @proxified.matrix(cluster_centroids, cluster_centroids, dimension, departure, arrival, language, options)
 
+      crow_matrix = @crow.matrix(cluster_centroids, cluster_centroids, dimension, departure, arrival, language, options)
+      if m[:matrix_time]
+        coef_matrix_time = cluster_centroids.size.times.collect{ |i|
+        cluster_centroids.size.times.collect{ |j|
+            crow_matrix[:matrix_time][i][j] == 0 ? 0.0 : m[:matrix_time][i][j] / crow_matrix[:matrix_time][i][j]
+          }
+        }
+      end
+      if m[:matrix_distance]
+        coef_matrix_distance = cluster_centroids.size.times.collect{ |i|
+        cluster_centroids.size.times.collect{ |j|
+            crow_matrix[:matrix_distance][i][j] == 0 ? 0.0 : m[:matrix_distance][i][j] / crow_matrix[:matrix_distance][i][j]
+          }
+        }
+      end
+
       cluster_matrices = c.clusters.collect{ |cluster|
         cluster_points = cluster.data_items.collect{ |data_item|
           src[data_item[0]]
@@ -87,8 +105,8 @@ module Wrappers
             m[:matrix_distance][src_index][dst_index] = cluster_matrices[src_cluster_index][:matrix_distance][src_index_in_cluster][dst_index_in_cluster] if matrix_distance
           else
             # Approximate values
-            m[:matrix_time][src_index][dst_index] = matrix_time[src_cluster_index][dst_cluster_index] if matrix_time
-            m[:matrix_distance][src_index][dst_index] = matrix_distance[src_cluster_index][dst_cluster_index] if matrix_distance
+            m[:matrix_time][src_index][dst_index] = crow_matrix[:matrix_time][src_cluster_index][dst_cluster_index] * coef_matrix_time[src_cluster_index][dst_cluster_index] if matrix_time
+            m[:matrix_distance][src_index][dst_index] = crow_matrix[:matrix_time][src_cluster_index][dst_cluster_index] * coef_matrix_distance[src_cluster_index][dst_cluster_index] if matrix_distance
           end
         }
       }
