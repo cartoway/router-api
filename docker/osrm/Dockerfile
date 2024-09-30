@@ -108,10 +108,10 @@ RUN mkdir -p /usr/local/share/osrm/data/ && \
 ################
 
 ARG OSRM_ISOCHRONE_VERSION
-ENV OSRM_ISOCHRONE_VERSION ${OSRM_ISOCHRONE_VERSION:-5.12.1}
+ENV OSRM_ISOCHRONE_VERSION ${OSRM_ISOCHRONE_VERSION:-5.26.0}
 
 # Install osrm-isochrone-server
-RUN echo "{\"dependencies\":{\"osrm\":\"file:////osrm-backend\",\"osrm-isochrone-server\":\"git+https://github.com/Mapotempo/osrm-isochrone-server.git#v${OSRM_ISOCHRONE_VERSION}\"}}" > package.json && \
+RUN echo "{\"dependencies\":{\"osrm\":\"file:////osrm-backend\",\"osrm-isochrone-server\":\"git+https://github.com/cartoway/osrm-isochrone-server.git#v${OSRM_ISOCHRONE_VERSION}\"}}" > package.json && \
     npm install
 
 # Services part
