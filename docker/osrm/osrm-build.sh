@@ -22,7 +22,7 @@ for PBF_URL in $PBF_URLS; do
         echo "PBF exists, skip download: ${PBF_DATE}"
     else
         echo "Dowload PBF ${PBF_DATE}"
-        curl ${PBF_URL} > /srv/osrm/data/${PBF_DATE}
+        curl -L ${PBF_URL} > /srv/osrm/data/${PBF_DATE}
         rm -fr /srv/osrm/data/${PBF_LATEST}
         ln -s ${PBF_DATE} /srv/osrm/data/${PBF_LATEST}
     fi
