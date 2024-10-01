@@ -78,6 +78,7 @@ function init(data) {
   });
 
   getMode().change(function(e) {
+    initDimensions();
     createIsoline();
   });
 
