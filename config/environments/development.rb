@@ -27,6 +27,7 @@ require './wrappers/here'
 require './wrappers/here8'
 require './wrappers/osrm'
 require './wrappers/otp'
+require './wrappers/graphhopper'
 
 require './lib/cache_manager'
 
@@ -72,6 +73,8 @@ module RouterWrapper
   HERE_CAR = Wrappers::Here.new(CACHE, app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'car')
   HERE8_CAR = Wrappers::Here8.new(CACHE, apikey: ENV['HERE8_APIKEY'], mode: 'car', over_400km: false)
 
+  GRAPHHOPPER = Wrappers::GraphHopper.new(CACHE, url: 'http://localhost:8989', profile: 'car', licence: 'ODbL', attribution: '© OpenStreetMap contributors')
+
   PARAMS_LIMIT = { locations: 1_000_000 }.freeze
 
   REDIS_COUNT = ENV['REDIS_COUNT_HOST'] && Redis.new(host: ENV['REDIS_COUNT_HOST'])
@@ -96,6 +99,7 @@ module RouterWrapper
           truck: [HERE_TRUCK],
           here_car: [HERE_CAR],
           here8: [HERE8_CAR],
+          graphhopper: [GRAPHHOPPER],
         },
         matrix: {
           crow: [CROW],
@@ -104,6 +108,7 @@ module RouterWrapper
           truck: [HERE_TRUCK],
           here_car: [HERE_CAR],
           here8: [HERE8_CAR],
+          graphhopper: [GRAPHHOPPER],
         },
         isoline: {
           crow: [CROW],
@@ -112,6 +117,7 @@ module RouterWrapper
           truck: [HERE_TRUCK],
           here_car: [HERE_CAR],
           here8: [HERE8_CAR],
+          graphhopper: [GRAPHHOPPER],
         }
       }
     },

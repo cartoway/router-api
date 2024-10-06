@@ -26,6 +26,7 @@ require './wrappers/osrm'
 require './wrappers/otp'
 require './wrappers/here'
 require './wrappers/here8'
+require './wrappers/graphhopper'
 
 require './lib/cache_manager'
 
@@ -67,6 +68,7 @@ module RouterWrapper
   # Use a cache for HERE event in test to avoid to pay requests
   CACHE_HERE = ActiveSupport::Cache::FileStore.new(File.join(Dir.tmpdir, 'router'), namespace: 'router', expires_in: 60 * 10)
   HERE8_CAR = Wrappers::Here8.new(CACHE_HERE, apikey: ENV['HERE8_APIKEY'], mode: 'car', over_400km: false)
+  GRAPHHOPPER = Wrappers::GraphHopper.new(CACHE, url: 'http://localhost:8989', profile: 'car', licence: 'ODbL', attribution: '© OpenStreetMap contributors')
 
   PARAMS_LIMIT = { locations: 10000 }.freeze
   REDIS_COUNT = Redis.new # Fake redis
@@ -102,6 +104,7 @@ module RouterWrapper
           otp: [OTP_BORDEAUX],
           here: [HERE_TRUCK],
           here8: [HERE8_CAR],
+          graphhopper: [GRAPHHOPPER],
         },
         matrix: {
           crow: [CROW],
@@ -109,6 +112,7 @@ module RouterWrapper
           otp: [OTP_BORDEAUX],
           here: [HERE_TRUCK],
           here8: [HERE8_CAR],
+          graphhopper: [GRAPHHOPPER],
         },
         isoline: {
           crow: [CROW],
@@ -116,6 +120,7 @@ module RouterWrapper
           otp: [OTP_BORDEAUX],
           here: [HERE_TRUCK],
           here8: [HERE8_CAR],
+          graphhopper: [GRAPHHOPPER],
         }
       }
     },
