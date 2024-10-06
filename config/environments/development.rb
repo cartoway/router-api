@@ -15,7 +15,7 @@
 # along with Mapotempo. If not, see:
 # <http://www.gnu.org/licenses/agpl.html>
 #
-require "redis"
+require 'redis'
 require 'active_support'
 require 'active_support/core_ext'
 require 'byebug'

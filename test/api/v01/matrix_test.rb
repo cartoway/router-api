@@ -149,7 +149,7 @@ class Api::V01::MatrixTest < Minitest::Test
       # can be the rest of starts number or max_start
       assert [max_start, @start_number % 5].include?(params.keys.select { |key| key =~ /^start/ }.count)
 
-      {"response" => {"matrixEntry" => [{"startIndex" => 0, "destinationIndex" => 0, "summary" => {"travelTime" => 0, "costFactor" => 1}}, {"startIndex" => 0, "destinationIndex" => 1, "summary" => {"travelTime" => 1356, "costFactor" => 1750}}]}}
+      {'response' => {'matrixEntry' => [{'startIndex' => 0, 'destinationIndex' => 0, 'summary' => {'travelTime' => 0, 'costFactor' => 1}}, {'startIndex' => 0, 'destinationIndex' => 1, 'summary' => {'travelTime' => 1356, 'costFactor' => 1750}}]}}
     }) do
       centroid = { lat: 43.851084, lng: -1.385374 }
       [
@@ -249,6 +249,6 @@ class Api::V01::MatrixTest < Minitest::Test
     post '/0.1/matrix', { api_key: 'demo', src: '48.407237, -2.816638, 44.44469, -2.75015', strict_restriction: false, mode: 'here' }
 
     assert last_response.ok?, last_response.body
-    assert_equal [[0, nil], [nil, nil]], JSON.parse(last_response.body)["matrix_time"]
+    assert_equal [[0, nil], [nil, nil]], JSON.parse(last_response.body)['matrix_time']
   end
 end

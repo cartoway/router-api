@@ -83,13 +83,13 @@ module Wrappers
       # Cache defined inside private get method
       params = build_route_params(dimension, departure_time, arrival_time, lang, with_geometry, options).delete_if { |k, v| v.nil? }
 
-      params["origin"] = "#{locs[0][0]},#{locs[0][1]}"
+      params['origin'] = "#{locs[0][0]},#{locs[0][1]}"
       locs.each_with_index.to_a[1..-2].each{ |loc, index|
         raise 'Via point Not implemented'
         # TODO Support via parameter, requires multiple `via` paramters, not supported by RestClient
-        params["via"] = "#{loc[0]},#{loc[1]}"
+        params['via'] = "#{loc[0]},#{loc[1]}"
       }
-      params["destination"] = "#{locs[-1][0]},#{locs[-1][1]}"
+      params['destination'] = "#{locs[-1][0]},#{locs[-1][1]}"
 
       request = get(@url_router, 'v8/routes', params)
 
