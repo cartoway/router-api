@@ -1,6 +1,7 @@
 .git
 .env
 /docker/redis*
+/docker/graphhopper/data
 /docker/osrm/data
 /docker/osrm/landuses
 /docker/osrm/profiles

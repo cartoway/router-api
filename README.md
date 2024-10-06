@@ -199,3 +199,9 @@ docker compose -f docker-compose-tools.yml exec redis-build redis-cli SAVE
 docker compose -f docker-compose-tools.yml down postgis
 docker compose -f docker-compose-tools.yml down redis-build
 ```
+
+### GraphHopper
+#### Build the graph
+```
+docker compose run --rm gh-car-iceland gh-build.sh
+```

@@ -1,0 +1,31 @@
+graphhopper:
+  datareader.file: /dev/null # datareader.file should exists in the config file
+  graph.location: /tmp # graph.location should exists and point to directory
+  profiles:
+    - name: car
+      custom_model_files: [car.json]
+    - name: bike
+      custom_model_files: [bike.json, bike_elevation.json]
+
+  profiles_lm:
+    - profile: car
+    - profile: bike
+  prepare.lm.threads: 4
+
+  profiles_ch:
+    - profile: car
+    - profile: bike
+  prepare.ch.threads: 4
+
+  routing.non_ch.max_waypoint_distance: 400000 # 400km
+
+  import.osm.ignored_highways:
+
+  graph.encoded_values: car_access, car_average_speed, roundabout, toll, bike_priority, bike_access, bike_average_speed, average_slope
+
+server:
+  application_connectors:
+  - type: http
+    port: 8989
+  request_log:
+      appenders: []

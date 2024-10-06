@@ -122,5 +122,19 @@ class Api::V01::CapabilityTest < Minitest::Test
         }
         assert_equal [true], supports.flatten.uniq, "support_#{option} is false for osrm"
     }
+
+    # GraphHopper
+    (Wrappers::Wrapper::OPTIONS - [
+      :low_emission_zone,
+      :large_light_vehicle,
+      :trailers,
+      :hazardous_goods,
+      :strict_restriction]).each { |option|
+        supports = []
+        ['route', 'matrix', 'isoline'].each{ |op|
+          supports << response[op].select{ |r| r['mode'] == 'graphhopper' }.map{ |r| r["support_#{option}"] }
+        }
+        assert_equal [true], supports.flatten.uniq, "support_#{option} is false for graphhopper"
+    }
   end
 end

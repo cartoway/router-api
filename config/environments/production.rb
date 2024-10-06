@@ -25,6 +25,7 @@ require './wrappers/osrm'
 require './wrappers/otp'
 require './wrappers/here'
 require './wrappers/here8'
+require './wrappers/graphhopper'
 
 require './lib/cache_manager'
 
@@ -41,6 +42,7 @@ module RouterWrapper
   HERE_APP_CODE = nil
   HERE_TRUCK = Wrappers::Here.new(CACHE, app_id: HERE_APP_ID, app_code: HERE_APP_CODE, mode: 'truck')
   HERE8_CAR = Wrappers::Here8.new(CACHE, apikey: ENV['HERE8_APIKEY'], mode: 'car', over_400km: false)
+  GRAPHHOPPER = Wrappers::GraphHopper.new(CACHE, url: 'http://gh-car-iceland:8989', profile: 'car', licence: 'ODbL', attribution: '© OpenStreetMap contributors')
 
   PARAMS_LIMIT = { locations: 1000 }.freeze
   REDIS_COUNT = ENV['REDIS_COUNT_HOST'] && Redis.new(host: ENV['REDIS_COUNT_HOST'])

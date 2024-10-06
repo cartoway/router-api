@@ -1,0 +1,16 @@
+version: '3.3'
+services:
+  api:
+    depends_on:
+      - gh-car-iceland
+
+  gh-car-iceland:
+    build:
+      context: docker/graphhopper
+    environment:
+      BASENAME: car-iceland
+      PBF_URLS: http://download.geofabrik.de/europe/iceland-latest.osm.pbf http://download.geofabrik.de/europe/andorra-latest.osm.pbf
+    volumes:
+      - ./docker/graphhopper/data:/srv/graphhopper/data
+      - ./docker/graphhopper/config.yaml:/opt/app/config.yaml
+    restart: unless-stopped
