@@ -17,7 +17,6 @@
 #
 require './api/v01/entities/route_result_properties_router'
 
-
 module Api
   module V01
     class RouteResultProperties < Grape::Entity

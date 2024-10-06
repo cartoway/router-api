@@ -20,7 +20,6 @@ require './test/test_helper'
 require './wrappers/osrm'
 
 class Wrappers::OsrmTest < Minitest::Test
-
   def _test_router
     osrm = RouterWrapper::OSRM
     result = osrm.route([[49.610710, 18.237305], [47.010226, 2.900391]], :time, nil, nil, 'en', true)
@@ -155,7 +154,7 @@ class Wrappers::OsrmTest < Minitest::Test
   def test_large_matrix_split
     osrm = RouterWrapper::OSRM
     # 101 points inside south-west(50.0,1.0) and north-east(51.0,2.0)
-    vector = (0..100).collect{ |i| [50 + Float(i) / 100, 1 + Float(i) / 100]}
+    vector = (0..100).collect{ |i| [50 + Float(i) / 100, 1 + Float(i) / 100] }
     result = osrm.matrix(vector, vector, :time_distance, nil, nil, 'en', strict_restriction: true)
     assert_equal vector.size, result[:matrix_time].size
     assert_equal vector.size, result[:matrix_time][0].size

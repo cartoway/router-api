@@ -199,13 +199,15 @@ module Api
           headers = { 'Content-Type' => content_type,
                       'X-RateLimit-Limit' => e.data[:limit],
                       'X-RateLimit-Remaining' => e.data[:remaining],
-                      'X-RateLimit-Reset' => if e.data[:reset] == :daily
-                                             count_time.to_date.next_day
-                                           elsif e.data[:reset] == :monthly
-                                             count_time.to_date.next_month
-                                           elsif e.data[:reset] == :yearly
-                                             count_time.to_date.next_year
-                                           end.to_time.to_i }
+                      'X-RateLimit-Reset' => (
+                        if e.data[:reset] == :daily
+                          count_time.to_date.next_day
+                        elsif e.data[:reset] == :monthly
+                          count_time.to_date.next_month
+                        elsif e.data[:reset] == :yearly
+                          count_time.to_date.next_year
+                        end.to_time.to_i
+                      ) }
           rack_response(format_message(response, nil), 429, headers)
         else
           Sentry.capture_exception(e) if defined?(Sentry)

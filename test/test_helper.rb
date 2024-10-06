@@ -23,7 +23,7 @@ require 'fakeredis/minitest'
 
 ENV['APP_ENV'] ||= 'test'
 require File.expand_path('../../config/environments/' + ENV['APP_ENV'], __FILE__)
-Dir[File.dirname(__FILE__) + '/../config/initializers/*.rb'].each {|file| require file }
+Dir[File.dirname(__FILE__) + '/../config/initializers/*.rb'].each { |file| require file }
 require './router_wrapper'
 require './api/root'
 

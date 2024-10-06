@@ -20,7 +20,6 @@ require './test/test_helper'
 require './wrappers/here'
 
 class Wrappers::HereTest < Minitest::Test
-
   def test_router
     here = RouterWrapper::HERE_TRUCK
     result = here.route([[49.610710, 18.237305], [47.010226, 2.900391]], :time, nil, nil, 'en', true, {motorway: true, toll: true})
@@ -109,9 +108,9 @@ class Wrappers::HereTest < Minitest::Test
 
   def test_large_matrix_split
     # activate cache because of large matrix
-    here = Wrappers::Here.new(ActiveSupport::Cache::FileStore.new(File.join(Dir.tmpdir, 'router'), namespace: 'router', expires_in: 60*10), app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'truck')
+    here = Wrappers::Here.new(ActiveSupport::Cache::FileStore.new(File.join(Dir.tmpdir, 'router'), namespace: 'router', expires_in: 60 * 10), app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'truck')
     # 101 points inside south-west(50.0,10.0) and north-east(51.0,11.0) (small zone to avoid timeout with here)
-    vector = (0..100).collect{ |i| [50 + Float(i) / 100, 10 + Float(i) / 100]}
+    vector = (0..100).collect{ |i| [50 + Float(i) / 100, 10 + Float(i) / 100] }
     result = here.matrix(vector, vector, :time, nil, nil, 'en', strict_restriction: true)
     assert_equal vector.size, result[:matrix_time].size
     assert_equal vector.size, result[:matrix_time][0].size
@@ -127,7 +126,7 @@ class Wrappers::HereTest < Minitest::Test
 
   def test_router_with_toll_costs
     here = RouterWrapper::HERE_TRUCK
-    result = here.route([[44.92727960202825, -1.091766357421875], [43.29959713447473,3.41400146484375]], :time, nil, nil, 'en', false, {motorway: true, toll: true, toll_costs: true, weight: 3.4, height: 3, width: 2.5, length: 10})
+    result = here.route([[44.92727960202825, -1.091766357421875], [43.29959713447473, 3.41400146484375]], :time, nil, nil, 'en', false, {motorway: true, toll: true, toll_costs: true, weight: 3.4, height: 3, width: 2.5, length: 10})
     assert result[:features][0][:properties][:router][:total_toll_costs]
   end
 

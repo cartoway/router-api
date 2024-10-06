@@ -17,7 +17,6 @@
 #
 require './api/v01/entities/router_desc'
 
-
 module Api
   module V01
     class ServicesDesc < Grape::Entity

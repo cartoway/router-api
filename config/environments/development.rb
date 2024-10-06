@@ -38,22 +38,22 @@ module RouterWrapper
     {
       mask: %w[l1 l2],
       mapping: {
-        [true, true]   => 'urban_dense',
-        [true, false]  => 'urban',
+        [true, true] => 'urban_dense',
+        [true, false] => 'urban',
         [false, false] => 'interurban',
-        [false, true]  => 'water_body'
+        [false, true] => 'water_body'
       }
     },
     {
       mask: %w[w1 w2 w3],
       mapping: {
-        [true, true, true]    => 'trunk',
-        [true, true, false]   => 'primary',
-        [true, false, true]   => 'secondary',
-        [true, false, false]  => 'tertiary',
-        [false, true, true]   => 'residential',
-        [false, true, false]  => 'minor',
-        [false, false, true]  => nil,
+        [true, true, true] => 'trunk',
+        [true, true, false] => 'primary',
+        [true, false, true] => 'secondary',
+        [true, false, false] => 'tertiary',
+        [false, true, true] => 'residential',
+        [false, true, false] => 'minor',
+        [false, false, true] => nil,
         [false, false, false] => nil
       }
     }

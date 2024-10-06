@@ -149,7 +149,7 @@ class Api::V01::MatrixTest < Minitest::Test
       # can be the rest of starts number or max_start
       assert [max_start, @start_number % 5].include?(params.keys.select { |key| key =~ /^start/ }.count)
 
-      {"response"=>{"matrixEntry"=>[{"startIndex"=>0, "destinationIndex"=>0, "summary"=>{"travelTime"=>0, "costFactor"=>1}}, {"startIndex"=>0, "destinationIndex"=>1, "summary"=>{"travelTime"=>1356, "costFactor"=>1750}}]}}
+      {"response" => {"matrixEntry" => [{"startIndex" => 0, "destinationIndex" => 0, "summary" => {"travelTime" => 0, "costFactor" => 1}}, {"startIndex" => 0, "destinationIndex" => 1, "summary" => {"travelTime" => 1356, "costFactor" => 1750}}]}}
     }) do
       centroid = { lat: 43.851084, lng: -1.385374 }
       [

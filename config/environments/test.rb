@@ -37,22 +37,22 @@ module RouterWrapper
     {
       mask: %w[l1 l2],
       mapping: {
-        [true, true]   => 'urban_dense',
-        [true, false]  => 'urban',
+        [true, true] => 'urban_dense',
+        [true, false] => 'urban',
         [false, false] => 'interurban',
-        [false, true]  => 'water_body'
+        [false, true] => 'water_body'
       }
     },
     {
       mask: %w[w1 w2 w3],
       mapping: {
-        [true, true, true]    => 'trunk',
-        [true, true, false]   => 'primary',
-        [true, false, true]   => 'secondary',
-        [true, false, false]  => 'tertiary',
-        [false, true, true]   => 'residential',
-        [false, true, false]  => 'minor',
-        [false, false, true]  => nil,
+        [true, true, true] => 'trunk',
+        [true, true, false] => 'primary',
+        [true, false, true] => 'secondary',
+        [true, false, false] => 'tertiary',
+        [false, true, true] => 'residential',
+        [false, true, false] => 'minor',
+        [false, false, true] => nil,
         [false, false, false] => nil
       }
     }
@@ -65,7 +65,7 @@ module RouterWrapper
   HERE_TRUCK = Wrappers::Here.new(CACHE, app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'truck')
   HERE_CAR = Wrappers::Here.new(CACHE, app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'car')
   # Use a cache for HERE event in test to avoid to pay requests
-  CACHE_HERE = ActiveSupport::Cache::FileStore.new(File.join(Dir.tmpdir, 'router'), namespace: 'router', expires_in: 60*10)
+  CACHE_HERE = ActiveSupport::Cache::FileStore.new(File.join(Dir.tmpdir, 'router'), namespace: 'router', expires_in: 60 * 10)
   HERE8_CAR = Wrappers::Here8.new(CACHE_HERE, apikey: ENV['HERE8_APIKEY'], mode: 'car', over_400km: false)
 
   PARAMS_LIMIT = { locations: 10000 }.freeze

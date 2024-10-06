@@ -18,7 +18,6 @@
 require 'digest/md5'
 require 'border_patrol'
 
-
 module Wrappers
   class Wrapper
     OPTIONS = [

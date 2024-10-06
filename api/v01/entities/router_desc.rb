@@ -16,7 +16,6 @@
 # <http://www.gnu.org/licenses/agpl.html>
 #
 
-
 module Api
   module V01
     class RouterDesc < Grape::Entity

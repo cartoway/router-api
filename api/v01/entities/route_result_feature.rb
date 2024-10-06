@@ -18,7 +18,6 @@
 require './api/v01/entities/route_result_properties'
 require './api/v01/entities/geo_json_geometry'
 
-
 module Api
   module V01
     class RouteResultFeature < Grape::Entity

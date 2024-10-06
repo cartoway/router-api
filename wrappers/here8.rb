@@ -21,7 +21,6 @@ require 'flexible_polyline'
 
 module Wrappers
   class Here8 < Wrapper
-
     def initialize(cache, hash = {})
       super(cache, hash)
       @url_router = 'https://router.hereapi.com'
@@ -301,8 +300,8 @@ module Wrappers
         'vehicle[width]': options[:width] ? (options[:width] * 100).to_i : nil, # Truck routing only, vehicle width in centimeters.
         'vehicle[length]': options[:length] ? (options[:length] * 100).to_i : nil, # Truck routing only, vehicle length in centimeters.
         'vehicle[shippedHazardousGoods]': [here_hazardous_map[options[:hazardous_goods]]].compact, # Truck routing only, list of hazardous materials.
-        #tunnelCategory : # Specifies the tunnel category to restrict certain route links. The route will pass only through tunnels of a les
-        return: ['summary', with_geometry ? 'polyline': nil].compact.join(',')
+        # tunnelCategory : # Specifies the tunnel category to restrict certain route links. The route will pass only through tunnels of a les
+        return: ['summary', with_geometry ? 'polyline' : nil].compact.join(',')
         # options[:toll_costs]
       }
     end
@@ -373,6 +372,7 @@ module Wrappers
             raise RouterWrapper::InvalidArgumentError.new(error), ['Here', error['code'], error['title'], error['cause'], error['action']].compact.join(', ')
           end
           raise ['Here', error['code'], error['title'], error['cause'], error['action']].compact.join(', ') if error['code']
+
           raise ['Here', error['error'], error['error_description']].compact.join(', ')
         end
 

@@ -14,8 +14,14 @@ Style/ZeroLengthPredicate:
 Layout/ArrayAlignment:
   EnforcedStyle: with_fixed_indentation
 
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+
 Style/NegatedIf:
   Enabled: false
+
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
 
 Minitest/RefuteFalse:
   Enabled: false

@@ -19,7 +19,6 @@ require './test/test_helper'
 require './wrappers/crow'
 
 class Wrappers::CrowTest < Minitest::Test
-
   def test_route
     crow = RouterWrapper::CROW
     result = crow.route([[49.610710, 18.237305], [47.010226, 2.900391]], :time, nil, nil, 'en', true, {motorway: true, toll: true})

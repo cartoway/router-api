@@ -18,7 +18,6 @@
 require './api/v01/entities/entity'
 require './api/v01/entities/route_result_feature'
 
-
 module Api
   module V01
     class RouteResultRouter < Grape::Entity

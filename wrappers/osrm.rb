@@ -21,7 +21,7 @@ require './lib/earth'
 require 'uri'
 require 'rest-client'
 require 'addressable'
-#RestClient.log = $stdout
+# RestClient.log = $stdout
 require 'polylines'
 
 module Wrappers
@@ -153,17 +153,19 @@ module Wrappers
         features: []
       }
 
-      ret[:features] = (json['routes'] || []).collect{ |route| {
-        type: 'Feature',
-        properties: {
-          router: {
-            total_distance: route['distance'],
-            total_time: (route['duration'] * 1.0 / (options[:speed_multiplier] || 1)).round(1),
-            start_point: locs[0].reverse,
-            end_point: locs[-1].reverse
+      ret[:features] = (json['routes'] || []).collect{ |route|
+        {
+          type: 'Feature',
+          properties: {
+            router: {
+              total_distance: route['distance'],
+              total_time: (route['duration'] * 1.0 / (options[:speed_multiplier] || 1)).round(1),
+              start_point: locs[0].reverse,
+              end_point: locs[-1].reverse
+            }
           }
         }
-      }}
+      }
       if options[:with_summed_by_area]
         (json['routes'] || []).each_with_index{ |route, index|
           ret[:features][index][:properties][:router][:summed_by_area] = distance_by_way_type(route, options[:precision])
@@ -332,6 +334,7 @@ module Wrappers
 
     def reverse_area_mapping(classes)
       return [] if classes.nil?
+
       standard_classes = classes.select{ |c| @whitelist_classes.include?(c) }
 
       reversed_classes = @area_mapping.collect{ |m|

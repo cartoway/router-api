@@ -18,7 +18,6 @@
 require './wrappers/wrapper'
 require './lib/earth'
 
-
 module Wrappers
   class Crow < Wrapper
     def initialize(cache, hash = {})

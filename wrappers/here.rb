@@ -19,7 +19,6 @@ require './wrappers/wrapper'
 
 module Wrappers
   class Here < Wrapper
-
     def initialize(cache, hash = {})
       super(cache, hash)
       @url_router = 'https://route.api.here.com/routing'
@@ -98,7 +97,7 @@ module Wrappers
         width: options[:width], # Truck routing only, vehicle width in meters.
         length: options[:length], # Truck routing only, vehicle length in meters.
         shippedHazardousGoods: here_hazardous_map[options[:hazardous_goods]], # Truck routing only, list of hazardous materials.
-        #tunnelCategory : # Specifies the tunnel category to restrict certain route links. The route will pass only through tunnels of a les
+        # tunnelCategory : # Specifies the tunnel category to restrict certain route links. The route will pass only through tunnels of a les
         legAttributes: options[:toll_costs] ? 'maneuvers,waypoint,length,travelTime,links' : nil,
         # maneuverAttributes: options[:toll_costs] ? 'link' : nil, # links are already returned in legs
         linkAttributes: options[:toll_costs] && !with_geometry ? 'speedLimit' : nil, # Avoid shapes
@@ -251,7 +250,7 @@ module Wrappers
         width: options[:width], # Truck routing only, vehicle width in meters.
         length: options[:length], # Truck routing only, vehicle length in meters.
         shippedHazardousGoods: here_hazardous_map[options[:hazardous_goods]], # Truck routing only, list of hazardous materials.
-        #tunnelCategory : # Specifies the tunnel category to restrict certain route links. The route will pass only through tunnels of a les
+        # tunnelCategory : # Specifies the tunnel category to restrict certain route links. The route will pass only through tunnels of a les
         # truckRestrictionPenalty: here_strict_restriction(options[:strict_restriction])
       }.delete_if { |k, v| v.nil? }
 
@@ -327,12 +326,12 @@ module Wrappers
               elsif additional_data.include?({ 'key' => 'error_code', 'value' => 'NGEO_ERROR_ROUTING_CANCELLED' })
                 return
               elsif additional_data.include?({ 'key' => 'error_code', 'value' => 'NGEO_ERROR_ROUTE_NO_START_POINT' }) || additional_data.include?({ 'key' => 'error_code', 'value' => 'NGEO_ERROR_ROUTE_NO_END_POINT' })
-                Api::Root.logger.debug("Here, UnreachablePoint: #{params.keys.grep(/waypoint/).map{|key| params[key]}}")
+                Api::Root.logger.debug("Here, UnreachablePoint: #{params.keys.grep(/waypoint/).map{ |key| params[key] }}")
                 return
               elsif error['subtype'] == 'InvalidInputData'
                 raise RouterWrapper::InvalidArgumentError.new(error), "Here, #{error['subtype']}: #{error['details']} (#{additional_data.first['key']} : #{additional_data.first['value']})"
               elsif error['subtype'] == 'NoRouteFound'
-                raise RouterWrapper::NoRouteFound.new(error), "Here, #{error['subtype']}: #{params.keys.grep(/waypoint/).map{|key| params[key]}}"
+                raise RouterWrapper::NoRouteFound.new(error), "Here, #{error['subtype']}: #{params.keys.grep(/waypoint/).map{ |key| params[key] }}"
               else
                 raise
               end
@@ -403,7 +402,7 @@ module Wrappers
                       :width,
                       :length,
                       :shippedHazardousGoods,
-                      #:tunnelCategory,
+                      # :tunnelCategory,
                     ].include? k
                   }.merge({
                     alternatives: 0,
@@ -422,7 +421,7 @@ module Wrappers
                   end
                 else
                   Api::Root.logger.debug("Status failed, request set to nil (waypoint0: 'geo!#{param_start['start' + e['startIndex'].to_s]}'', waypoint1: 'geo!#{param_destination['destination' + e['destinationIndex'].to_s]}''), strict_restriction: #{strict_restriction} (nb_request: #{nb_request}) srcs_start: #{srcs_start}, dsts: #{dsts_start + dsts_split - 1} / #{dsts.size}")
-                  Api::Root.logger.debug("#{@url_matrix}/7.2/calculatematrix.json?#{params.dup.merge(param_start).merge({app_id: @app_id, app_code: @app_code}).merge(param_destination).reject{|mp, vl| vl.nil?}.to_query}")
+                  Api::Root.logger.debug("#{@url_matrix}/7.2/calculatematrix.json?#{params.dup.merge(param_start).merge({app_id: @app_id, app_code: @app_code}).merge(param_destination).reject{ |mp, vl| vl.nil? }.to_query}")
                   request = nil
                   break
                 end
@@ -430,7 +429,7 @@ module Wrappers
             }
           else
             Api::Root.logger.debug('Request failed')
-            Api::Root.logger.debug("#{@url_matrix}/7.2/calculatematrix.json?#{params.dup.merge(param_start).merge({app_id: @app_id, app_code: @app_code}).merge(param_destination).reject{|mp, vl| vl.nil?}.to_query}")
+            Api::Root.logger.debug("#{@url_matrix}/7.2/calculatematrix.json?#{params.dup.merge(param_start).merge({app_id: @app_id, app_code: @app_code}).merge(param_destination).reject{ |mp, vl| vl.nil? }.to_query}")
             request = nil
           end
 

@@ -22,7 +22,6 @@ require './wrappers/here8'
 require './router_wrapper'
 
 class Wrappers::Here8Test < Minitest::Test
-
   def test_router
     here = RouterWrapper::HERE8_CAR
     result = here.route([[49.610710, 18.237305], [47.010226, 2.900391]], :time, nil, nil, 'en', true, {motorway: true, toll: true})
@@ -127,7 +126,7 @@ class Wrappers::Here8Test < Minitest::Test
 
   def test_large_matrix_split
     # activate cache because of large matrix
-    here = Wrappers::Here8.new(ActiveSupport::Cache::FileStore.new(File.join(Dir.tmpdir, 'router'), namespace: 'router', expires_in: 60*10), apikey: ENV['HERE8_APIKEY'], mode: 'truck', over_400km: false)
+    here = Wrappers::Here8.new(ActiveSupport::Cache::FileStore.new(File.join(Dir.tmpdir, 'router'), namespace: 'router', expires_in: 60 * 10), apikey: ENV['HERE8_APIKEY'], mode: 'truck', over_400km: false)
     # 101 points inside south-west(50.0,10.0) and north-east(51.0,11.0) (small zone to avoid timeout with here)
     vector = (0..20).collect{ |i|
       [
