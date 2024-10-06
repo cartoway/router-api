@@ -135,7 +135,6 @@ ENV NODE_CONFIG "{ \"maxspeed\": 115 }"
 ENV PROFILE ""
 ENV REGION ""
 
-# Define entry point
 CMD [ "/usr/bin/osrm-start.sh" ]
 
 # Monkey patch of isochrone
