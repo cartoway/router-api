@@ -1,25 +1,25 @@
 source 'https://rubygems.org'
 ruby '>= 3'
 
-gem 'rack'
-gem 'rake'
 gem 'puma'
+gem 'rack'
 gem 'rack-cors'
 gem 'rack-server-pages'
+gem 'rake'
 
 gem 'grape'
-gem 'grape_logging'
 gem 'grape-entity'
+gem 'grape_logging'
 gem 'grape-swagger'
 gem 'grape-swagger-entity'
 
+gem 'actionpack'
+gem 'activesupport'
+gem 'addressable'
+gem 'border_patrol'
 gem 'i18n'
 gem 'rack-contrib'
 gem 'rest-client'
-gem 'addressable'
-gem 'border_patrol'
-gem 'activesupport'
-gem 'actionpack'
 
 gem 'sentry-ruby'
 
@@ -34,7 +34,7 @@ end
 
 group :development, :test do
   gem 'byebug'
-  gem 'mapotempo_rubocop', :git => 'https://github.com/Mapotempo/mapotempo_rubocop.git'
+  gem 'rubocop-policy', github: 'cartoway/rubocop-policy'
 end
 
 gem 'dotenv'
@@ -46,6 +46,6 @@ group :development, :production do
 end
 
 group :production do
-  gem 'redis-store'
   gem 'redis-activesupport'
+  gem 'redis-store'
 end
