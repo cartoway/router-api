@@ -1,3 +1,17 @@
+# Build
+
+FROM maven:3.9.5-eclipse-temurin-21 AS build
+
+ARG GRAPHHOPPER_VERSION
+ENV GRAPHHOPPER_VERSION ${GRAPHHOPPER_VERSION:-DijkstraOneToManyMatrixCalculator}
+
+RUN git clone --depth 1 --branch ${GRAPHHOPPER_VERSION} https://github.com/cartoway/graphhopper.git
+RUN cd graphhopper && \
+    mvn clean install -DskipTests
+
+
+# Runtime
+
 FROM eclipse-temurin:21
 
 RUN apt update && \
@@ -5,12 +19,9 @@ RUN apt update && \
         osmium-tool \
         curl
 
-ARG GRAPHHOPPER_VERSION
-ENV GRAPHHOPPER_VERSION ${GRAPHHOPPER_VERSION:-9.1}
-
 RUN mkdir /opt/app
 WORKDIR /opt/app
-RUN curl -L https://github.com/graphhopper/graphhopper/releases/download/${GRAPHHOPPER_VERSION}/graphhopper-web-${GRAPHHOPPER_VERSION}.jar > graphhopper.jar
+COPY --from=build /graphhopper/web/target/graphhopper*.jar ./graphhopper.jar
 
 COPY gh-build.sh /usr/bin/gh-build.sh
 COPY gh-start.sh /usr/bin/gh-start.sh
