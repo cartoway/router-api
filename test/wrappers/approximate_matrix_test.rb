@@ -188,21 +188,26 @@ class Wrappers::CrowTest < Minitest::Test
       Ai4r::Clusterers::WardLinkageHierarchical,
       Ai4r::Clusterers::WeightedAverageLinkage
     ]
+
+    router = RouterWrapper::CROW
+    starting = Time.now
+    router_result = router.matrix(SHOPS_URBAN, SHOPS_URBAN, :time, nil, nil, 'en', {motorway: true, toll: true})
+    time_router = Time.now - starting
+    puts "Full matrix computation duration: #{time_router}"
+
     stats = clusterers.to_h{ |clusterer|
       puts clusterer
       clusterer_stats = sizes.collect { |max_size|
-        router = RouterWrapper::CROW
         approx = Wrappers::ApproximateMatrix.new(RouterWrapper::CACHE, router, clusterer, max_size) # Max matrix size is 2
 
-        router_result = router.matrix(SHOPS_URBAN, SHOPS_URBAN, :time, nil, nil, 'en', {motorway: true, toll: true})
-        router_result[:router].delete(:attribution)
+        starting = Time.now
         approx_result = approx.matrix(SHOPS_URBAN, SHOPS_URBAN, :time, nil, nil, 'en', {motorway: true, toll: true})
-        approx_result[:router].delete(:attribution)
+        time_approx = Time.now - starting
 
-        compute_error(router_result[:matrix_time], approx_result[:matrix_time])
+        compute_error(router_result[:matrix_time], approx_result[:matrix_time]) + [time_approx]
       }.flatten
-      a = clusterer_stats.each_slice(2).to_a.transpose
-      [clusterer, [a[0], a[1]]]
+      a = clusterer_stats.each_slice(3).to_a.transpose
+      [clusterer, a]
     }
     puts 'error %, mean'
     puts (['clusterer'] + sizes).join(',') + "\n"
@@ -213,6 +218,11 @@ class Wrappers::CrowTest < Minitest::Test
     puts (['clusterer'] + sizes).join(',') + "\n"
     clusterers.each{ |clusterer|
       puts ([clusterer] + stats[clusterer][1]).join(',') + "\n"
+    }
+    puts 'comput duration'
+    puts (['clusterer'] + sizes).join(',') + "\n"
+    clusterers.each{ |clusterer|
+      puts ([clusterer] + stats[clusterer][2]).join(',') + "\n"
     }
   end
 end
