@@ -24,6 +24,10 @@ require 'polylines'
 
 module Wrappers
   class GraphHopper < Wrapper
+    TIMEOUT_DEFAULT_OPEN ||= 3
+    TIMEOUT_DEFAULT ||= 60
+    TIMEOUT_DEFAULT_MATRIX ||= 60 * 5
+
     def initialize(cache, hash = {})
       super(cache, hash)
       @url = hash[:url]
@@ -181,7 +185,7 @@ module Wrappers
         params[:fail_fast] = false
         params = params.delete_if { |_k, v| v.nil? || v == '' }
 
-        json = post('matrix', @key, params)
+        json = post('matrix', @key, params, read_timeout: TIMEOUT_DEFAULT_MATRIX)
       end
 
       {
@@ -341,25 +345,25 @@ module Wrappers
       JSON.parse(request)
     end
 
-    def get(path, key, params)
+    def get(path, key, params, open_timeout: TIMEOUT_DEFAULT_OPEN, read_timeout: TIMEOUT_DEFAULT)
       request(path, key) do
         {
           method: :get,
           url: "#{@url}/#{path}",
-          # open_timeout: TIMEOUT_DEFAULT_OPEN,
-          # read_timeout: TIMEOUT_DEFAULT,
+          open_timeout: open_timeout,
+          read_timeout: read_timeout,
           headers: { params: params.merge(key: key) },
         }
       end
     end
 
-    def post(path, key, params)
+    def post(path, key, params, open_timeout: TIMEOUT_DEFAULT_OPEN, read_timeout: TIMEOUT_DEFAULT)
       request(path, key) do
         {
           method: :post,
           url: "#{@url}/#{path}?key=#{key}",
-          # open_timeout: TIMEOUT_DEFAULT_OPEN,
-          # read_timeout: TIMEOUT_DEFAULT,
+          open_timeout: open_timeout,
+          read_timeout: read_timeout,
           headers: {'Content-Type' => 'application/json'},
           payload: params.to_json,
         }
