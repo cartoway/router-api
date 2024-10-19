@@ -23,7 +23,6 @@ require 'dotenv'
 require 'tmpdir'
 
 require './wrappers/crow'
-require './wrappers/here'
 require './wrappers/here8'
 require './wrappers/osrm'
 require './wrappers/otp'
@@ -69,8 +68,6 @@ module RouterWrapper
 
   OTP_BORDEAUX = Wrappers::Otp.new(CACHE, url: 'http://localhost:7000', router_id: 'idf', licence: 'ODbL', attribution: 'Bordeaux Métropole', area: 'Bordeaux', crs: 'EPSG:2154')
 
-  HERE_TRUCK = Wrappers::Here.new(CACHE, app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'truck')
-  HERE_CAR = Wrappers::Here.new(CACHE, app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'car')
   HERE8_CAR = Wrappers::Here8.new(CACHE, apikey: ENV['HERE8_APIKEY'], mode: 'car', over_400km: false)
 
   GRAPHHOPPER = Wrappers::GraphHopper.new(CACHE, url: 'http://localhost:8989', profile: 'car', licence: 'ODbL', attribution: '© OpenStreetMap contributors')
@@ -96,8 +93,6 @@ module RouterWrapper
           osrm: [OSRM],
           crow: [CROW],
           otp: [OTP_BORDEAUX],
-          truck: [HERE_TRUCK],
-          here_car: [HERE_CAR],
           here8: [HERE8_CAR],
           graphhopper: [GRAPHHOPPER],
         },
@@ -105,8 +100,6 @@ module RouterWrapper
           crow: [CROW],
           osrm: [OSRM],
           otp: [OTP_BORDEAUX],
-          truck: [HERE_TRUCK],
-          here_car: [HERE_CAR],
           here8: [HERE8_CAR],
           graphhopper: [GRAPHHOPPER],
         },
@@ -114,8 +107,6 @@ module RouterWrapper
           crow: [CROW],
           osrm: [OSRM],
           otp: [OTP_BORDEAUX],
-          truck: [HERE_TRUCK],
-          here_car: [HERE_CAR],
           here8: [HERE8_CAR],
           graphhopper: [GRAPHHOPPER],
         }

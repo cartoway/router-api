@@ -24,7 +24,6 @@ require 'tmpdir'
 require './wrappers/crow'
 require './wrappers/osrm'
 require './wrappers/otp'
-require './wrappers/here'
 require './wrappers/here8'
 require './wrappers/graphhopper'
 
@@ -63,8 +62,6 @@ module RouterWrapper
   CROW = Wrappers::Crow.new(CACHE, boundary: 'poly/france-marseille.kml')
   OSRM = Wrappers::Osrm.new(CACHE, url_time: 'http://localhost:5000', url_distance: 'http://localhost:5000', url_isochrone: 'http://localhost:1723', url_isodistance: 'http://localhost:1723', track: true, toll: true, motorway: true, area_mapping: area_mapping, whitelist_classes: whitelist_classes, with_summed_by_area: true, licence: 'ODbL', attribution: '© OpenStreetMap contributors', area: 'Europe', boundary: 'poly/europe.kml')
   OTP_BORDEAUX = Wrappers::Otp.new(CACHE, url: 'http://localhost:7001', router_id: 'bordeaux', licence: 'ODbL', attribution: 'Bordeaux Métropole', area: 'Bordeaux', crs: 'EPSG:2154')
-  HERE_TRUCK = Wrappers::Here.new(CACHE, app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'truck')
-  HERE_CAR = Wrappers::Here.new(CACHE, app_id: ENV['HERE_APP_ID'], app_code: ENV['HERE_APP_CODE'], mode: 'car')
   # Use a cache for HERE event in test to avoid to pay requests
   CACHE_HERE = ActiveSupport::Cache::FileStore.new(File.join(Dir.tmpdir, 'router'), namespace: 'router', expires_in: 60 * 10)
   HERE8_CAR = Wrappers::Here8.new(CACHE_HERE, apikey: ENV['HERE8_APIKEY'], mode: 'car', over_400km: false)
@@ -102,7 +99,6 @@ module RouterWrapper
           crow: [CROW],
           osrm: [OSRM],
           otp: [OTP_BORDEAUX],
-          here: [HERE_TRUCK],
           here8: [HERE8_CAR],
           graphhopper: [GRAPHHOPPER],
         },
@@ -110,7 +106,6 @@ module RouterWrapper
           crow: [CROW],
           osrm: [OSRM],
           otp: [OTP_BORDEAUX],
-          here: [HERE_TRUCK],
           here8: [HERE8_CAR],
           graphhopper: [GRAPHHOPPER],
         },
@@ -118,7 +113,6 @@ module RouterWrapper
           crow: [CROW],
           osrm: [OSRM],
           otp: [OTP_BORDEAUX],
-          here: [HERE_TRUCK],
           here8: [HERE8_CAR],
           graphhopper: [GRAPHHOPPER],
         }
