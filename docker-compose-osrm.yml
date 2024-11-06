@@ -16,5 +16,6 @@ services:
       - ./docker/osrm/data:/srv/osrm/data
       - ./docker/osrm/profiles:/srv/osrm/profiles
       - ./docker/osrm/low_emission_zone.geojson:/usr/local/share/osrm/data/low_emission_zone.geojson
+      - ./docker/osrm/limited_traffic_zone.geojson:/usr/local/share/osrm/data/limited_traffic_zone.geojson
       - /dev/log:/dev/log
     restart: unless-stopped

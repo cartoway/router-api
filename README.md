@@ -182,9 +182,9 @@ docker compose -f docker-compose-tools.yml exec postgis bash -c "\\
 "
 ```
 
-#### Generate Low Emission Zone GeoJSON
+#### Generate Low Emission Zone and Limited Traffic Zone GeoJSON
 
-Add the file at `docker/osrm/low_emission_zone.geojson`.
+Add the file at `docker/osrm/low_emission_zone.geojson` and `docker/osrm/limited_traffic_zone.geojson`.
 
 #### Build the graph
 ```
