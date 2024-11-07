@@ -63,7 +63,7 @@ module Api
         optional :lang, type: String, default: :en
         requires :loc, type: Array[Float], coerce_with: ->(c) { c.split(',').collect{ |f| Float(f) } }, desc: 'Start latitude and longitude separated with a comma, e.g. lat1,lng1.', documentation: { param_type: 'query' }
 
-        requires :size, type: Integer, coerce_with: ->(c) { Integer(c) }, desc: 'Size of isoline. Time in second, distance in meters.'
+        requires :size, type: Integer, coerce_with: ->(c) { Integer(Float(c)) }, desc: 'Size of isoline. Time in second, distance in meters.'
       }
       resource :isoline do
         desc 'Isoline from a start point', {
