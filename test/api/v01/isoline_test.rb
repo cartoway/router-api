@@ -39,6 +39,14 @@ class Api::V01::IsolineTest < Minitest::Test
     }
   end
 
+  def test_isoline_with_float_string
+    [:get, :post].each{ |method|
+      send method, '/0.1/isoline', {api_key: 'demo', loc: '43.2804,5.3806', size: '33.1', departure: Time.now}
+      assert last_response.ok?, last_response.body
+      assert !JSON.parse(last_response.body)['features'][0]['geometry'].empty?
+    }
+  end
+
   def test_isoline_none_loc
     [:get, :post].each{ |method|
       send method, '/0.1/isoline', {api_key: 'demo'}
