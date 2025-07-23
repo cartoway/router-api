@@ -1,0 +1,18 @@
+diff --git a/vite.config.ts b/vite.config.ts
+index 0cc309f..a2d3e55 100644
+--- a/vite.config.ts
++++ b/vite.config.ts
+@@ -28,4 +28,13 @@ export default defineConfig({
+     host: '0.0.0.0',
+     port: 5173,
+   },
++  build: {
++    rollupOptions: {
++      output: {
++        entryFileNames: 'assets/route-[hash].js',
++        chunkFileNames: 'assets/route-[hash].js',
++        assetFileNames: 'assets/route-[hash][extname]'
++      }
++    }
++  }
+ });
