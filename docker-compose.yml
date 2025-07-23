@@ -7,12 +7,14 @@ services:
       - "8082:80" # HOST:CONTAINER, edit only HOST part
     volumes:
       - .:/srv/app
+      - ./router-demo/dist:/srv/app/public
       - ./docker/access.rb:/srv/app/config/access.rb
       - ./docker/production.rb:/srv/app/config/environments/production.rb
       - ./docker/production.rb:/srv/app/config/environments/development.rb
       - ./docker/poly:/srv/app/poly
     depends_on:
       - redis-cache
+      - router-demo-build
     environment:
       REDIS_HOST: redis-cache
       APP_ENV: ${APP_ENV:-development}
@@ -20,6 +22,21 @@ services:
       SENTRY_DSN: ${SENTRY_DSN}
     command: bundle exec puma -v -p 80 --pidfile 'tmp/server.pid'
     restart: unless-stopped
+
+  router-demo-build:
+    image: node:20
+    working_dir: /srv/app/router-demo
+    volumes:
+      - .:/srv/app
+    command: >
+      sh -c "\
+        patch vite.config.ts < ../config/router-demo.vite.patch && \
+        npm install && \
+        npm run build && \
+        mv dist/index.html dist/route.html && \
+        cp -r dist/* ../public/ && \
+        patch -R vite.config.ts < ../config/router-demo.vite.patch\
+      "
 
   redis-cache:
     image: redis:${REDIS_VERSION:-7-alpine}

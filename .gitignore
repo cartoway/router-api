@@ -25,6 +25,7 @@ build/
 /docker/osrm/landuses
 /docker/osrm/profiles
 /docker/otp/data
+/docker/access.rb
 /docker/production.rb
 
 ## Environment normalisation:
@@ -52,3 +53,8 @@ local.env
 
 # Redis
 *.aof
+
+## Submodules build
+public/assets/
+public/*.svg
+public/route.html

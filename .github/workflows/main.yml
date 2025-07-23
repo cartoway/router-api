@@ -42,6 +42,10 @@ jobs:
       id-token: write
 
     steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
       - name: Docker Build and Push
         uses: cartoway/docker-compose-build-push-action@main
         with:

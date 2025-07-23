@@ -205,3 +205,40 @@ docker compose -f docker-compose-tools.yml down redis-build
 ```
 docker compose run --rm gh-car-iceland gh-build.sh
 ```
+
+## Local router-demo submodule
+
+To work on with the router-demo locally, you must load the front-end submodule `router-demo` (web interface).
+
+### 1. Initialize the submodule
+
+Before using Docker or building, run:
+
+```bash
+git submodule update --init --recursive
+```
+
+### 2. Build the docker image
+
+You can use the following script to automate everything:
+
+```bash
+docker-compose up --build
+```
+
+The build of the `router-demo` submodule is automatically handled by the `router-demo-build` service in `docker-compose.yml`. The generated files are copied into the `public/` folder and served by the API.
+
+### 4. Access the web interface
+
+After launching, access the front-end at:
+- [http://localhost:8082/route.html](http://localhost:8082/route.html)
+
+JS/CSS assets are served automatically.
+
+### 5. Update the submodule
+
+To update the front-end:
+
+```bash
+git submodule update --remote --merge
+```
