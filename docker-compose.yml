@@ -13,7 +13,6 @@ services:
       - ./docker/poly:/srv/app/poly
     depends_on:
       - redis-cache
-      - router-demo-build
     environment:
       REDIS_HOST: redis-cache
       APP_ENV: ${APP_ENV:-development}
@@ -23,6 +22,8 @@ services:
     restart: unless-stopped
 
   router-demo-build:
+    profiles:
+      - tools
     image: node:20
     working_dir: /srv/app/router-demo
     volumes:
