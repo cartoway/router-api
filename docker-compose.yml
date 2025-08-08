@@ -17,8 +17,8 @@ services:
     environment:
       REDIS_HOST: redis-cache
       APP_ENV: ${APP_ENV:-development}
-      HERE8_APIKEY: ${HERE8_APIKEY}
-      SENTRY_DSN: ${SENTRY_DSN}
+      HERE8_APIKEY: ${HERE8_APIKEY:-}
+      SENTRY_DSN: ${SENTRY_DSN:-}
     command: bundle exec puma -v -p 80 --pidfile 'tmp/server.pid'
     restart: unless-stopped
 
