@@ -30,3 +30,11 @@ COPY config.yaml config.yaml
 
 CMD [ "/usr/bin/gh-start.sh" ]
 EXPOSE 8989
+
+HEALTHCHECK \
+    --start-interval=5s \
+    --start-period=120s \
+    --interval=30s \
+    --timeout=20s \
+    --retries=5 \
+    CMD curl -f http://127.0.0.1:8989/health || exit 1

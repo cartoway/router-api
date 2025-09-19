@@ -1,7 +1,7 @@
 # Modified from Docker file from OSRM tu use Lua 5.3 in place of 5.4
 # Beacause lua-sql-postgres not capataible with lua-redis Lua 5.4 in debian:bullseye
 # https://github.com/Project-OSRM/osrm-backend/blob/master/docker/Dockerfile
-FROM debian:bullseye-slim as builder
+FROM debian:bullseye-slim AS builder
 ARG DOCKER_TAG
 ARG BUILD_CONCURRENCY
 RUN mkdir -p /src  && mkdir -p /opt
@@ -55,7 +55,7 @@ RUN NPROC=1 && \
 
 # Multistage build to reduce image size - https://docs.docker.com/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds
 # Only the content below ends up in the image, this helps remove /src from the image (which is large)
-FROM debian:bullseye-slim as runstage
+FROM debian:bullseye-slim AS runstage
 
 COPY --from=builder /usr/local /usr/local
 COPY --from=builder /opt /opt
@@ -103,6 +103,14 @@ RUN apt update && \
 RUN mkdir -p /usr/local/share/osrm/data/ && \
     curl https://raw.githubusercontent.com/Project-OSRM/osrm-backend/master/data/driving_side.geojson > /usr/local/share/osrm/data/driving_side.geojson && \
     curl https://raw.githubusercontent.com/Project-OSRM/osrm-backend/master/data/maxheight.geojson > /usr/local/share/osrm/data/maxheight.geojson
+
+HEALTHCHECK \
+    --start-interval=5s \
+    --start-period=120s \
+    --interval=30s \
+    --timeout=20s \
+    --retries=5 \
+    CMD curl -f http://127.0.0.1:5000/nearest/v1/_/0,0.json || exit 1
 
 # Isochrone part
 ################
