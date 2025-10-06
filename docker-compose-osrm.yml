@@ -7,6 +7,13 @@ x-osrm: &x-osrm
     - ./docker/osrm/low_emission_zone.geojson:/usr/local/share/osrm/data/low_emission_zone.geojson
     - ./docker/osrm/limited_traffic_zone.geojson:/usr/local/share/osrm/data/limited_traffic_zone.geojson
     - /dev/log:/dev/log
+  depends_on:
+    osrm-build-postgis:
+      condition: service_healthy
+      required: false
+    osrm-build-redis:
+      condition: service_healthy
+      required: false
   restart: unless-stopped
 
 services:
@@ -21,3 +28,36 @@ services:
       PBF_URLS: http://download.geofabrik.de/europe/iceland-latest.osm.pbf http://download.geofabrik.de/europe/andorra-latest.osm.pbf
       PROFILE: /srv/osrm/profiles/car/car.lua
       ALGORITHM: ch # "ch" or "mld"
+
+  osrm-build-postgis:
+    profiles:
+      - build
+    image: postgis/postgis:15-3.4
+    environment:
+      POSTGRES_USER: postgis
+      POSTGRES_PASSWORD: postgis
+    volumes:
+      - postgis:/var/lib/postgres
+      - ./docker/osrm/landuses:/landuses
+    healthcheck:
+      test: pg_isready
+      start_interval: 1s
+      start_period: 30s
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  osrm-build-redis:
+    profiles:
+      - build
+    image: redis:${REDIS_VERSION:-7-alpine}
+    healthcheck:
+      test: redis-cli --raw incr ping
+      start_interval: 1s
+      start_period: 30s
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  postgis:

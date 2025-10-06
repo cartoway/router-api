@@ -63,7 +63,7 @@ Enable components in `COMPOSE_FILE` var. Only required for non external engines.
 
 Build docker images
 ```
-docker compose build
+docker compose --profile=* build
 ```
 
 Launch containers
@@ -152,8 +152,8 @@ ogr2ogr \
 
 #### Init landuse database
 ```bash
-docker compose -f docker-compose-tools.yml up -d postgis
-docker compose -f docker-compose-tools.yml exec postgis bash -c "\\
+docker compose --profile=build up -d osrm-build-postgis
+docker compose --profile=build exec osrm-build-postgis bash -c "\\
   psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} -c \"
     CREATE TABLE urban (gid serial, code int4);
     ALTER TABLE urban ADD PRIMARY KEY (gid);
@@ -166,8 +166,8 @@ docker compose -f docker-compose-tools.yml exec postgis bash -c "\\
 
 Load a shapefile. See below how to get shapefile.
 ```bash
-docker compose -f docker-compose-tools.yml up -d postgis
-docker compose -f docker-compose-tools.yml exec postgis bash -c "\\
+docker compose --profile=build up -d osrm-build-postgis
+docker compose --profile=build exec osrm-build-postgis bash -c "\\
     apt update && apt install -y postgis && \\
     shp2pgsql -a /landuses/urban.shp urban | psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} \\
 "
@@ -175,7 +175,7 @@ docker compose -f docker-compose-tools.yml exec postgis bash -c "\\
 
 Alternatively, for test purpose only, add just one record into the table
 ```bash
-docker compose -f docker-compose-tools.yml exec postgis bash -c "\\
+docker compose --profile=build exec osrm-build-postgis bash -c "\\
   psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} -c \"
     INSERT INTO urban (code, geom) VALUES ('1', NULL);
   \"
@@ -188,20 +188,20 @@ Add the file at `docker/osrm/low_emission_zone.geojson` and `docker/osrm/limited
 
 #### Build the graph
 ```
-docker compose -f docker-compose-tools.yml up -d postgis redis-build
-docker compose run --rm osrm-car-iceland build.sh
+docker compose --profile=build up -d osrm-build-postgis redis-build
+docker compose --profile=build run --rm osrm-car-iceland build.sh
 ```
 
-After the build process `postgis` and `redis-build` could be stoped.
+After the build process `osrm-build-postgis` and `osrm-build-redis` could be stoped.
 ```
-docker compose -f docker-compose-tools.yml exec redis-build redis-cli SAVE
-docker compose -f docker-compose-tools.yml down postgis redis-build
+docker compose --profile=build exec osrm-build-redis redis-cli SAVE
+docker compose --profile=build down osrm-build-postgis osrm-build-redis
 ```
 
 ### GraphHopper
 #### Build the graph
 ```
-docker compose run --rm gh-car-iceland build.sh
+docker compose --profile=build run --rm gh-car-iceland build.sh
 ```
 
 ## Local router-demo submodule
