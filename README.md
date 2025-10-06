@@ -189,7 +189,7 @@ Add the file at `docker/osrm/low_emission_zone.geojson` and `docker/osrm/limited
 #### Build the graph
 ```
 docker compose -f docker-compose-tools.yml up -d postgis redis-build
-docker compose run --rm osrm-car-iceland osrm-build.sh
+docker compose run --rm osrm-car-iceland build.sh
 ```
 
 After the build process `postgis` and `redis-build` could be stoped.
@@ -201,7 +201,7 @@ docker compose -f docker-compose-tools.yml down postgis redis-build
 ### GraphHopper
 #### Build the graph
 ```
-docker compose run --rm gh-car-iceland gh-build.sh
+docker compose run --rm gh-car-iceland build.sh
 ```
 
 ## Local router-demo submodule

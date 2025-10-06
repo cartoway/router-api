@@ -23,12 +23,12 @@ RUN mkdir /opt/app
 WORKDIR /opt/app
 COPY --from=build /graphhopper/web/target/graphhopper*.jar ./graphhopper.jar
 
-COPY gh-build.sh /usr/bin/gh-build.sh
-COPY gh-start.sh /usr/bin/gh-start.sh
+COPY build.sh /usr/bin/build.sh
+COPY start.sh /usr/bin/start.sh
 
 COPY config.yaml config.yaml
 
-CMD [ "/usr/bin/gh-start.sh" ]
+CMD [ "/usr/bin/start.sh" ]
 EXPOSE 8989
 
 HEALTHCHECK \

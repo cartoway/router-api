@@ -135,15 +135,15 @@ COPY service/isochrone/run /etc/service/isochrone/run
 
 # Copy startup and load scripts
 
-COPY osrm-start.sh /usr/bin/osrm-start.sh
-COPY osrm-load.sh /usr/bin/osrm-load.sh
-COPY osrm-build.sh /usr/bin/osrm-build.sh
+COPY start.sh /usr/bin/start.sh
+COPY load.sh /usr/bin/load.sh
+COPY build.sh /usr/bin/build.sh
 
 ENV NODE_CONFIG "{ \"maxspeed\": 115 }"
 ENV PROFILE ""
 ENV REGION ""
 
-CMD [ "/usr/bin/osrm-start.sh" ]
+CMD [ "/usr/bin/start.sh" ]
 
 # Monkey patch of isochrone
 RUN sed -i "s/true, distance_table:/true, algorithm: argv['algorithm'], distance_table:/" node_modules/osrm-isochrone-server/server.js
