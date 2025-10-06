@@ -1,20 +1,23 @@
+x-osrm: &x-osrm
+  build:
+    context: docker/osrm
+  volumes:
+    - ./docker/osrm/data:/srv/osrm/data
+    - ./docker/osrm/profiles:/srv/osrm/profiles
+    - ./docker/osrm/low_emission_zone.geojson:/usr/local/share/osrm/data/low_emission_zone.geojson
+    - ./docker/osrm/limited_traffic_zone.geojson:/usr/local/share/osrm/data/limited_traffic_zone.geojson
+    - /dev/log:/dev/log
+  restart: unless-stopped
+
 services:
   api:
     depends_on:
       - osrm-car-iceland
 
   osrm-car-iceland:
-    build:
-      context: docker/osrm
+    <<: *x-osrm
     environment:
       BASENAME: car-iceland
       PBF_URLS: http://download.geofabrik.de/europe/iceland-latest.osm.pbf http://download.geofabrik.de/europe/andorra-latest.osm.pbf
       PROFILE: /srv/osrm/profiles/car/car.lua
       ALGORITHM: ch # "ch" or "mld"
-    volumes:
-      - ./docker/osrm/data:/srv/osrm/data
-      - ./docker/osrm/profiles:/srv/osrm/profiles
-      - ./docker/osrm/low_emission_zone.geojson:/usr/local/share/osrm/data/low_emission_zone.geojson
-      - ./docker/osrm/limited_traffic_zone.geojson:/usr/local/share/osrm/data/limited_traffic_zone.geojson
-      - /dev/log:/dev/log
-    restart: unless-stopped

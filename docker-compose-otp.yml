@@ -1,15 +1,18 @@
+x-otp: &x-otp
+  build:
+    context: docker/otp
+  ports:
+    - "7001:7000"
+  volumes:
+    - ./docker/otp/data:/srv/otp/data
+  restart: unless-stopped
+
 services:
   api:
     depends_on:
       - otp-bordeaux
 
   otp-bordeaux:
-    build:
-      context: docker/otp
+    <<: *x-otp
     environment:
       GRAPH: bordeaux
-    ports:
-      - "7001:7000"
-    volumes:
-      - ./docker/otp/data:/srv/otp/data
-    restart: unless-stopped
