@@ -108,7 +108,7 @@ module Wrappers
           steps: options[:with_summed_by_area] || false,
           annotations: false,
           geometries: options[:format] != 'geojson' && {5 => :polyline, 6 => :polyline6}[options[:precision]] || :geojson,
-          overview: with_geometry ? :full : false,
+          overview: with_geometry ? :simplified : false,
           continue_straight: false,
           generate_hints: false,
           approaches: options[:approach] == :curb ? (['curb'] * locs.size).join(';') : nil,

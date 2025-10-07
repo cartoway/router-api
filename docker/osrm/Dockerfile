@@ -33,6 +33,9 @@ ENV OSRM_REPOSITORY ${OSRM_REPOSITORY:-https://github.com/Project-OSRM/osrm-back
 RUN git clone ${OSRM_REPOSITORY} --branch ${OSRM_VERSION} src
 WORKDIR /src
 
+COPY fixed-zoom-level-simplification.diff .
+RUN git apply fixed-zoom-level-simplification.diff
+
 RUN npm install cmake-js
 
 # RUN NPROC=${BUILD_CONCURRENCY:-$(nproc)} && \

@@ -1,0 +1,35 @@
+diff --git a/include/engine/douglas_peucker.hpp b/include/engine/douglas_peucker.hpp
+index 2be14a1ab..4d3b9d9cd 100644
+--- a/include/engine/douglas_peucker.hpp
++++ b/include/engine/douglas_peucker.hpp
+@@ -31,7 +31,7 @@ inline std::vector<std::uint64_t> generateThreshold(double min_pixel, unsigned n
+     return thresholds;
+ }
+ 
+-const constexpr std::uint64_t DOUGLAS_PEUCKER_THRESHOLDS[19] = {
++const constexpr std::uint64_t DOUGLAS_PEUCKER_THRESHOLDS[20] = {
+     49438476562500, // z0
+     12359619140625, // z1
+     3089903027344,  // z2
+@@ -51,6 +51,7 @@ const constexpr std::uint64_t DOUGLAS_PEUCKER_THRESHOLDS[19] = {
+     11449,          // z16
+     2809,           // z17
+     676,            // z18
++    169             // z19 approx value, I did not calculate it
+ };
+ 
+ const constexpr auto DOUGLAS_PEUCKER_THRESHOLDS_SIZE =
+diff --git a/src/engine/guidance/assemble_overview.cpp b/src/engine/guidance/assemble_overview.cpp
+index b87b1481b..a9becfb8d 100644
+--- a/src/engine/guidance/assemble_overview.cpp
++++ b/src/engine/guidance/assemble_overview.cpp
+@@ -64,7 +64,8 @@ std::vector<util::Coordinate> assembleOverview(const std::vector<LegGeometry> &l
+ 
+     if (use_simplification)
+     {
+-        const auto zoom_level = std::min(18u, calculateOverviewZoomLevel(leg_geometries));
++        auto zoom_level = std::min(18u, calculateOverviewZoomLevel(leg_geometries));
++        zoom_level = 19u;
+         for (const auto &geometry : leg_geometries)
+         {
+             const auto simplified =
