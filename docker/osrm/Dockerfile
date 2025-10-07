@@ -24,6 +24,7 @@ RUN mkdir -p /src /opt && \
         libzip-dev \
         lua5.3 \
         make \
+        npm \
         pkg-config
 
 ARG OSRM_REPOSITORY
@@ -31,6 +32,8 @@ ENV OSRM_REPOSITORY ${OSRM_REPOSITORY:-https://github.com/Project-OSRM/osrm-back
 
 RUN git clone ${OSRM_REPOSITORY} --branch ${OSRM_VERSION} src
 WORKDIR /src
+
+RUN npm install cmake-js
 
 # RUN NPROC=${BUILD_CONCURRENCY:-$(nproc)} && \
 RUN NPROC=1 && \
@@ -45,19 +48,18 @@ RUN NPROC=1 && \
     case ${DOCKER_TAG} in *"-debug"*) BUILD_TYPE="Debug";; esac && \
     case ${DOCKER_TAG} in *"-assertions"*) BUILD_TYPE="RelWithDebInfo" && ENABLE_ASSERTIONS="On";; esac && \
     echo "Building ${BUILD_TYPE} with ENABLE_ASSERTIONS=${ENABLE_ASSERTIONS}" && \
-    cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DENABLE_ASSERTIONS=${ENABLE_ASSERTIONS} -DENABLE_LTO=On && \
+    cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DENABLE_ASSERTIONS=${ENABLE_ASSERTIONS} -DENABLE_LTO=On -DENABLE_NODE_BINDINGS=On && \
     make -j${NPROC} install && \
     cd ../profiles && \
     cp -r * /opt && \
-    strip /usr/local/bin/* && \
-    rm -rf /src
+    strip /usr/local/bin/*
 
 # Multistage build to reduce image size - https://docs.docker.com/build/building/multi-stage/#use-multi-stage-builds
 # Only the content below ends up in the image, this helps remove /src from the image (which is large)
-FROM debian:bookworm-slim AS runstage
+# FROM debian:bookworm-slim AS runstage
 
-COPY --from=builder /usr/local /usr/local
-COPY --from=builder /opt /opt
+# COPY --from=builder /usr/local /usr/local
+# COPY --from=builder /opt /opt
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends --no-install-suggests \
@@ -117,9 +119,9 @@ ARG OSRM_ISOCHRONE_VERSION
 ENV OSRM_ISOCHRONE_VERSION ${OSRM_ISOCHRONE_VERSION:-6.0.0}
 
 # Install osrm-isochrone-server
-RUN echo "{\"name\":\"install\",\"dependencies\":{\"@project-osrm/osrm\":\"file:///opt\",\"osrm-isochrone-server\":\"git+https://github.com/cartoway/osrm-isochrone-server.git#v${OSRM_ISOCHRONE_VERSION}\"}}" > package.json && \
-    rm /opt/package-lock.json && \
-    npm install
+RUN echo "{\"name\":\"install\",\"dependencies\":{\"@project-osrm/osrm\":\"file:/src\",\"osrm-isochrone-server\":\"git+https://github.com/cartoway/osrm-isochrone-server.git#v${OSRM_ISOCHRONE_VERSION}\"}}" > package.json && \
+    npm install --legacy-peer-deps && \
+    npm link /src
 
 # Services part
 ###############

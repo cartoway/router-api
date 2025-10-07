@@ -2,9 +2,8 @@
 
 set -e
 
-NODE_MODULES=/opt/node_modules
+export NODE_MODULES=/opt/node_modules
+export NODE_CONFIG_DIR=/opt/node_modules/osrm-isochrone-server/config/
 
-ISOCHRONE_ROOT=$NODE_MODULES/osrm-isochrone-server
-
-cd $ISOCHRONE_ROOT
-exec /usr/bin/nodejs $ISOCHRONE_ROOT/server.js --port 6000 --algorithm ${ALGORITHM^^} 2>&1
+cd /opt
+exec npx osrm-isochrone-server --port 6000 --algorithm ${ALGORITHM^^} 2>&1
