@@ -36,6 +36,17 @@ WORKDIR /src
 COPY fixed-zoom-level-simplification.diff .
 RUN git apply fixed-zoom-level-simplification.diff
 
+# https://github.com/Project-OSRM/osrm-backend/pull/7142
+COPY fix_json-id-format.diff .
+RUN git apply fix_json-id-format.diff
+
+# # https://github.com/Project-OSRM/osrm-backend/pull/7282
+# COPY fix_max_excludable.diff .
+# RUN git apply fix_max_excludable.diff
+
+# COPY max_class.diff .
+# RUN git apply max_class.diff
+
 RUN npm install cmake-js
 
 # RUN NPROC=${BUILD_CONCURRENCY:-$(nproc)} && \

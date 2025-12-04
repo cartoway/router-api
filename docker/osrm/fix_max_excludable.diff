@@ -1,0 +1,22 @@
+commit 3bdbeeb0292016c1ac7e56d817e77e5f8ed68420
+Author: Frédéric Rodrigo <fred.rodrigo@gmail.com>
+Date:   Sat Nov 22 15:40:52 2025 +0100
+
+    As exclude index 0 is already reserver, aviable classes number is MAX_CLASS_INDEX aka MAX_EXCLUDABLE_CLASSES - 1
+
+diff --git a/src/extractor/extractor.cpp b/src/extractor/extractor.cpp
+index 435a0e481..0d52715ac 100644
+--- a/src/extractor/extractor.cpp
++++ b/src/extractor/extractor.cpp
+@@ -114,9 +114,9 @@ void SetExcludableClasses(const ExtractorCallbacks::ClassesMap &classes_map,
+                           const std::vector<std::vector<std::string>> &excludable_classes,
+                           ProfileProperties &profile_properties)
+ {
+-    if (excludable_classes.size() > MAX_EXCLUDABLE_CLASSES)
++    if (excludable_classes.size() > MAX_CLASS_INDEX)
+     {
+-        throw util::exception("Only " + std::to_string(MAX_EXCLUDABLE_CLASSES) +
++        throw util::exception("Only " + std::to_string(MAX_CLASS_INDEX) +
+                               " excludable combinations allowed.");
+     }
+ 

@@ -1,0 +1,221 @@
+commit 458f9b2b2755f82777cf23975150e51a34992248
+Author: Marcello Perathoner <marcello@perathoner.de>
+Date:   Mon Mar 31 10:12:55 2025 +0200
+
+    Initial commit
+
+diff --git a/include/engine/api/nearest_api.hpp b/include/engine/api/nearest_api.hpp
+index e402e46f4..867066f2c 100644
+--- a/include/engine/api/nearest_api.hpp
++++ b/include/engine/api/nearest_api.hpp
+@@ -65,7 +65,8 @@ class NearestAPI final : public BaseAPI
+                                auto &phantom_node = phantom_with_distance.phantom_node;
+ 
+                                auto node_values = MakeNodes(phantom_node);
+-                               fbresult::Uint64Pair nodes{node_values.first, node_values.second};
++                               fbresult::Uint64Pair nodes{from_alias<uint64_t>(node_values.first),
++                                                          from_alias<uint64_t>(node_values.second)};
+ 
+                                auto waypoint = MakeWaypoint(&fb_result, {phantom_node});
+                                waypoint->add_nodes(&nodes);
+@@ -123,10 +124,10 @@ class NearestAPI final : public BaseAPI
+     const NearestParameters &parameters;
+ 
+   protected:
+-    std::pair<uint64_t, uint64_t> MakeNodes(const PhantomNode &phantom_node) const
++    std::pair<OSMNodeID, OSMNodeID> MakeNodes(const PhantomNode &phantom_node) const
+     {
+-        std::uint64_t from_node = 0;
+-        std::uint64_t to_node = 0;
++        OSMNodeID from_node = OSMNodeID{0};
++        OSMNodeID to_node = OSMNodeID{0};
+ 
+         datafacade::BaseDataFacade::NodeForwardRange forward_geometry;
+         if (phantom_node.forward_segment_id.enabled)
+@@ -135,9 +136,8 @@ class NearestAPI final : public BaseAPI
+             const auto geometry_id = facade.GetGeometryIndex(segment_id).id;
+             forward_geometry = facade.GetUncompressedForwardGeometry(geometry_id);
+ 
+-            auto osm_node_id =
++            to_node =
+                 facade.GetOSMNodeIDOfNode(forward_geometry[phantom_node.fwd_segment_position]);
+-            to_node = static_cast<std::uint64_t>(osm_node_id);
+         }
+ 
+         if (phantom_node.reverse_segment_id.enabled)
+@@ -145,16 +145,13 @@ class NearestAPI final : public BaseAPI
+             auto segment_id = phantom_node.reverse_segment_id.id;
+             const auto geometry_id = facade.GetGeometryIndex(segment_id).id;
+             const auto geometry = facade.GetUncompressedForwardGeometry(geometry_id);
+-            auto osm_node_id =
+-                facade.GetOSMNodeIDOfNode(geometry[phantom_node.fwd_segment_position + 1]);
+-            from_node = static_cast<std::uint64_t>(osm_node_id);
++            from_node = facade.GetOSMNodeIDOfNode(geometry[phantom_node.fwd_segment_position + 1]);
+         }
+         else if (phantom_node.forward_segment_id.enabled && phantom_node.fwd_segment_position > 0)
+         {
+             // In the case of one way, rely on forward segment only
+-            auto osm_node_id =
++            from_node =
+                 facade.GetOSMNodeIDOfNode(forward_geometry[phantom_node.fwd_segment_position - 1]);
+-            from_node = static_cast<std::uint64_t>(osm_node_id);
+         }
+ 
+         return std::make_pair(from_node, to_node);
+diff --git a/include/engine/api/route_api.hpp b/include/engine/api/route_api.hpp
+index 08431a2cf..59c5650c6 100644
+--- a/include/engine/api/route_api.hpp
++++ b/include/engine/api/route_api.hpp
+@@ -842,8 +842,7 @@ class RouteAPI : public BaseAPI
+                     nodes.values.reserve(leg_geometry.node_ids.size());
+                     for (const auto node_id : leg_geometry.node_ids)
+                     {
+-                        nodes.values.push_back(
+-                            static_cast<std::uint64_t>(facade.GetOSMNodeIDOfNode(node_id)));
++                        nodes.values.push_back(facade.GetOSMNodeIDOfNode(node_id));
+                     }
+                     annotation.values.emplace("nodes", std::move(nodes));
+                 }
+diff --git a/include/nodejs/json_v8_renderer.hpp b/include/nodejs/json_v8_renderer.hpp
+index 75c687198..5c3fe55dc 100644
+--- a/include/nodejs/json_v8_renderer.hpp
++++ b/include/nodejs/json_v8_renderer.hpp
+@@ -21,6 +21,11 @@ struct V8Renderer
+         out = Napi::Number::New(env, number.value);
+     }
+ 
++    void operator()(const osrm::json::OSMID &osmid) const
++    {
++        out = Napi::BigInt::New(env, osmid.value);
++    }
++
+     void operator()(const osrm::json::Object &object) const
+     {
+         Napi::Object obj = Napi::Object::New(env);
+diff --git a/include/util/json_container.hpp b/include/util/json_container.hpp
+index 728b6e3e9..89ff64f05 100644
+--- a/include/util/json_container.hpp
++++ b/include/util/json_container.hpp
+@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #ifndef JSON_CONTAINER_HPP
+ #define JSON_CONTAINER_HPP
+ 
++#include "util/typedefs.hpp"
++
+ #include <string>
+ #include <unordered_map>
+ #include <utility>
+@@ -69,6 +71,17 @@ struct Number
+     double value;
+ };
+ 
++/**
++ * Typed OSM id.
++ */
++struct OSMID
++{
++    OSMID() = default;
++    OSMID(OSMNodeID id) : value{from_alias<uint64_t>(id)} {};
++    OSMID(OSMWayID id) : value{from_alias<uint64_t>(id)} {};
++    uint64_t value;
++};
++
+ /**
+  * Typed True.
+  */
+@@ -95,7 +108,7 @@ struct Null
+  *
+  * Dispatch on its type by either by using apply_visitor or its get function.
+  */
+-using Value = std::variant<String, Number, Object, Array, True, False, Null>;
++using Value = std::variant<String, Number, Object, Array, True, False, Null, OSMID>;
+ 
+ /**
+  * Typed Object.
+diff --git a/include/util/json_deep_compare.hpp b/include/util/json_deep_compare.hpp
+index 6c7ddd86a..b0b95c8b6 100644
+--- a/include/util/json_deep_compare.hpp
++++ b/include/util/json_deep_compare.hpp
+@@ -40,6 +40,17 @@ struct Comparator
+         return is_same;
+     }
+ 
++    bool operator()(const OSMID &lhs, const OSMID &rhs) const
++    {
++        bool is_same = lhs.value == rhs.value;
++        if (!is_same)
++        {
++            reason = lhs_path + " (= " + std::to_string(lhs.value) + ") != " + rhs_path +
++                     " (= " + std::to_string(rhs.value) + ")";
++        }
++        return is_same;
++    }
++
+     bool operator()(const Object &lhs, const Object &rhs) const
+     {
+         std::set<std::string_view> lhs_keys;
+diff --git a/include/util/json_renderer.hpp b/include/util/json_renderer.hpp
+index 2a6b9a90f..bdbe9ddec 100644
+--- a/include/util/json_renderer.hpp
++++ b/include/util/json_renderer.hpp
+@@ -58,6 +58,14 @@ template <typename Out> struct Renderer
+         write(buffer.data(), buffer.size());
+     }
+ 
++    void operator()(const OSMID &osmid)
++    {
++        fmt::memory_buffer buffer;
++        fmt::format_to(std::back_inserter(buffer), FMT_COMPILE("{}"), osmid.value);
++
++        write(buffer.data(), buffer.size());
++    }
++
+     void operator()(const Object &object)
+     {
+         write('{');
+diff --git a/unit_tests/library/nearest.cpp b/unit_tests/library/nearest.cpp
+index e3d12936a..ae0baf98a 100644
+--- a/unit_tests/library/nearest.cpp
++++ b/unit_tests/library/nearest.cpp
+@@ -168,8 +168,8 @@ void test_nearest_response_for_location_in_small_component(bool use_json_only_ap
+ 
+         const auto &nodes = std::get<json::Array>(waypoint_object.values.at("nodes")).values;
+         BOOST_CHECK(nodes.size() == 2);
+-        BOOST_CHECK(std::get<util::json::Number>(nodes[0]).value != 0);
+-        BOOST_CHECK(std::get<util::json::Number>(nodes[1]).value != 0);
++        BOOST_CHECK(std::get<util::json::OSMID>(nodes[0]).value != 0);
++        BOOST_CHECK(std::get<util::json::OSMID>(nodes[1]).value != 0);
+     }
+ }
+ BOOST_AUTO_TEST_CASE(test_nearest_response_for_location_in_small_component_old_api)
+diff --git a/unit_tests/util/json_render.cpp b/unit_tests/util/json_render.cpp
+index fc830b545..ad3c6e500 100644
+--- a/unit_tests/util/json_render.cpp
++++ b/unit_tests/util/json_render.cpp
+@@ -1,5 +1,6 @@
+ #include "util/json_container.hpp"
+ #include "util/json_renderer.hpp"
++#include "util/typedefs.hpp"
+ 
+ #include <boost/test/unit_test.hpp>
+ 
+@@ -25,6 +26,19 @@ BOOST_AUTO_TEST_CASE(integer)
+     BOOST_CHECK_EQUAL(str, "42");
+ }
+ 
++BOOST_AUTO_TEST_CASE(osmid)
++{
++    std::string str;
++    Renderer<std::string> renderer(str);
++
++    renderer(OSMNodeID{std::numeric_limits<uint64_t>::min()});
++    BOOST_CHECK_EQUAL(str, "0");
++    str.clear();
++
++    renderer(OSMNodeID{std::numeric_limits<uint64_t>::max()});
++    BOOST_CHECK_EQUAL(str, "18446744073709551615");
++}
++
+ BOOST_AUTO_TEST_CASE(test_json_issue_6531)
+ {
+     std::string output;
