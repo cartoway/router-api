@@ -132,7 +132,7 @@ module Wrappers
           properties: {
             router: {
               total_distance: route['distance'],
-              total_time: (route['time'].to_f / 60 / 60).round,
+              total_time: (route['time'].to_f / 1000).round,
               start_point: snapped_waypoints[0],
               end_point: snapped_waypoints[-1],
             }
@@ -193,7 +193,7 @@ module Wrappers
           licence: @licence,
           attribution: @attribution,
         },
-        matrix_time: json['times']&.collect{ |row| row.collect{ |i| i == 10000000.0 ? nil : (i.to_f / 60 / 60).round } },
+        matrix_time: json['times']&.collect{ |row| row.collect{ |i| i == 10000000.0 ? nil : (i.to_f / 1000).round } },
         matrix_distance: json['distances']&.collect{ |row| row.collect{ |i| i == 10000000.0 ? nil : i.round } },
       }
     end
