@@ -110,76 +110,97 @@ The script will build `bordeaux` graph from `./otp/data/graphs` in `/srv/docker`
 
 Landuses give better estimatid driving speed, but optional.
 
-#### Landuse database from "Corine Land Cover"
-Download GeoPackage from [Copernicus](https://land.copernicus.eu/pan-european/corine-land-cover/clc2018?tab=download) into the `landuses` directory. Double unzip.
+Configure the landuses database path in the profile.
 
-Convert the data
-```bash
-ogr2ogr -sql "SELECT * FROM (SELECT CASE CODE_18 WHEN 111 THEN 1 WHEN 112 THEN 2 WHEN 121 THEN 2 WHEN 123 THEN 2 WHEN 124 THEN 2 WHEN 511 THEN 5 WHEN 512 THEN 5 END AS code, Shape FROM U2018_CLC2018_V2020_20u1) AS t WHERE code is NOT NULL" -t_srs EPSG:4326 urban.shp U2018_CLC2018_V2020_20u1.gpkg
+#### Landuse database from "Corine Land Cover"
+Download GeoPackage from [Copernicus](https://land.copernicus.eu/en/products/corine-land-cover/clc2018#download) into the `landuses` directory. Double unzip.
+
+```
+duckdb -c "
+INSTALL spatial; LOAD spatial;
+SET geometry_always_xy = true;
+COPY (
+    WITH
+    bounds AS (SELECT ST_GeomFromGeoJSON('{\"type\":\"Polygon\",\"coordinates\":[[[-21.11,26.04],[12.04,31.15],[8.19,52.76],[-20.94,43.03],[-21.11,26.04]]]}') AS geom),
+    bounds_box AS (SELECT ST_Extent(geom)::BOX_2D AS box, ST_Extent(geom)::BOX_2D::STRUCT(min_x DOUBLE, min_y DOUBLE, max_x DOUBLE, max_y DOUBLE) AS b FROM bounds),
+    source AS (
+        SELECT
+            CASE CODE_18
+            WHEN '111' THEN 1
+            WHEN '112' THEN 2 WHEN '121' THEN 2 WHEN '123' THEN 2 WHEN '124' THEN 2
+            WHEN '511' THEN 5 WHEN '512' THEN 5
+            END AS code,
+            Shape AS geom
+        FROM ST_Read('U2018_CLC2018_V2020_20u1.gpkg')
+        WHERE ST_Intersects(Shape, ST_Transform((SELECT geom FROM bounds), 'EPSG:4326', 'EPSG:3035'))
+    ),
+    agg AS (SELECT code, ST_Transform(ST_Union_Agg(ST_Buffer(geom, CASE code WHEN 2 THEN 100 ELSE 0 END, 2)), 'EPSG:3035', 'EPSG:4326') AS geom FROM source GROUP BY code),
+    diff AS (
+        SELECT agg.code, ST_Difference(agg.geom, ST_Union_Agg(obb.geom)) AS geom FROM agg JOIN agg AS obb ON obb.code != 2 AND ST_Intersects(agg.geom, obb.geom) WHERE agg.code = 2 GROUP BY agg.code, agg.geom
+        UNION ALL
+        SELECT * FROM agg WHERE code != 2
+    ),
+    exploded AS (SELECT code, (unnest(ST_Dump(geom))).geom AS geom FROM diff),
+    grid AS (
+        SELECT ST_MakeEnvelope(x / 10, y / 10, x / 10 + 0.1, y / 10 + 0.1) AS cell
+        FROM
+            generate_series((SELECT (floor((b).min_x) * 10)::INT FROM bounds_box), (SELECT (ceil((b).max_x) * 10)::INT FROM bounds_box)) AS xs(x),
+            generate_series((SELECT (floor((b).min_y) * 10)::INT FROM bounds_box), (SELECT (ceil((b).max_y) * 10)::INT FROM bounds_box)) AS ys(y)
+    ),
+    clipped AS (
+        SELECT s.code, ST_Intersection(s.geom, g.cell) AS geom
+        FROM exploded s
+        JOIN grid g ON ST_Intersects(s.geom, g.cell)
+        WHERE s.code IS NOT NULL AND NOT ST_IsEmpty(ST_Intersection(s.geom, g.cell))
+    )
+    SELECT * FROM clipped ORDER BY ST_Hilbert(geom, (SELECT box FROM bounds_box))
+) TO 'urban-eu.parquet' (FORMAT parquet, COMPRESSION zstd);"
 ```
 
 #### Landuse database from OSM
 Download an .osm.pbf file. Eg. with Morocco
 
-```bash
-osmium \
-    tags-filter \
-    --overwrite -o morocco-landuse.osm.pbf \
-    morocco-latest.osm.pbf \
-    wr/landuse=residential,retail,railway,industrial,garages,construction,commercial,cemetery,village_green,religious,education \
-    wr/building!=no
-
-# Use meter unit, eg UTM zone
-ogr2ogr \
-    -t_srs EPSG:32629 \
-    morocco-landuse.gpkg \
-    morocco-landuse.osm.pbf \
-    multipolygons
-
-# Over simply approach, but it works
-ogr2ogr \
-    morocco-landuse-union.gpkg \
-    -dialect spatialite -sql 'SELECT ST_Union(ST_Buffer(geom, CASE WHEN landuse IS NOT NULL THEN 100 ELSE 50 END, 1)) AS geom FROM multipolygons' \
-    -explodecollections \
-    morocco-landuse.gpkg
-ogr2ogr \
-    -t_srs EPSG:4326 \
-    morocco-urban.shp \
-    -dialect spatialite -sql 'SELECT 2 AS code, ST_Simplify(geom, 20) AS geom FROM "SELECT" WHERE ST_Area(ST_Simplify(geom, 20)) > 30000' \
-    -explodecollections \
-    morocco-landuse-union.gpkg
 ```
-
-#### Init landuse database
-```bash
-docker compose --profile=build up -d osrm-build-postgis
-docker compose --profile=build exec osrm-build-postgis bash -c "\\
-  psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} -c \"
-    CREATE TABLE urban (gid serial, code int4);
-    ALTER TABLE urban ADD PRIMARY KEY (gid);
-    SELECT AddGeometryColumn('','urban','geom','0','MULTIPOLYGON',2);
-    ALTER TABLE urban ALTER COLUMN geom TYPE geometry(MultiPolygon, 4326);
-    CREATE INDEX urban_idx_geom ON urban USING gist(geom);
-  \"
-"
-```
-
-Load a shapefile. See below how to get shapefile.
-```bash
-docker compose --profile=build up -d osrm-build-postgis
-docker compose --profile=build exec osrm-build-postgis bash -c "\\
-    apt update && apt install -y postgis && \\
-    shp2pgsql -a /landuses/urban.shp urban | psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} \\
-"
-```
-
-Alternatively, for test purpose only, add just one record into the table
-```bash
-docker compose --profile=build exec osrm-build-postgis bash -c "\\
-  psql -U \${POSTGRES_USER} -w \${POSTGRES_PASSWORD} -c \"
-    INSERT INTO urban (code, geom) VALUES ('1', NULL);
-  \"
-"
+duckdb -c "
+INSTALL osmium FROM community; LOAD osmium;
+INSTALL spatial; LOAD spatial;
+SET geometry_always_xy = true;
+COPY (
+    WITH
+    bounds AS (SELECT ST_GeomFromGeoJSON('{\"type\":\"Polygon\",\"coordinates\":[[[-0.10,32.51],[-13.2,20.72],[-20.0,20.81],[-6.21,36.18],[-1.58,35.64],[-0.10,32.51]]]}') AS geom),
+    bounds_box AS (SELECT ST_Extent(geom)::BOX_2D AS box, ST_Extent(geom)::BOX_2D::STRUCT(min_x DOUBLE, min_y DOUBLE, max_x DOUBLE, max_y DOUBLE) AS b FROM bounds),
+    landuse_utm AS (
+        SELECT
+            ST_Union_Agg(ST_Buffer(
+                ST_Transform(geometry, 'EPSG:4326', 'EPSG:32629'),
+                CASE WHEN tags['landuse'] IS NOT NULL THEN 100 ELSE 50 END
+            )) AS geom
+        FROM 'morocco-latest.osm.pbf'
+        WHERE
+            kind = 'area' AND
+            tags['landuse'] IN ('residential','retail','railway','industrial','garages','construction','commercial','cemetery','village_green','religious','education') AND
+            (tags['building'] IS NULL OR tags['building'] != 'no')
+    ),
+    exploded AS (SELECT (unnest(ST_Dump(geom))).geom AS geom FROM landuse_utm),
+    urban AS (
+        SELECT ST_Transform(ST_Simplify(geom, 20), 'EPSG:32629', 'EPSG:4326') AS geom
+        FROM exploded
+        WHERE ST_Area(ST_Simplify(geom, 20)) > 30000
+    ),
+    grid AS (
+        SELECT ST_MakeEnvelope(x / 10, y / 10, x / 10 + 0.1, y / 10 + 0.1) AS cell
+        FROM
+            generate_series((SELECT (floor((b).min_x) * 10)::INT FROM bounds_box), (SELECT (ceil((b).max_x) * 10)::INT FROM bounds_box)) AS xs(x),
+            generate_series((SELECT (floor((b).min_y) * 10)::INT FROM bounds_box), (SELECT (ceil((b).max_y) * 10)::INT FROM bounds_box)) AS ys(y)
+    ),
+    clipped AS (
+        SELECT 2 AS code, ST_Intersection(u.geom, g.cell) AS geom
+        FROM urban u
+        JOIN grid g ON ST_Intersects(u.geom, g.cell)
+        WHERE NOT ST_IsEmpty(ST_Intersection(u.geom, g.cell))
+    )
+    SELECT * FROM clipped ORDER BY ST_Hilbert(geom, (SELECT box FROM bounds_box))
+) TO 'urban-mc.parquet' (FORMAT parquet, COMPRESSION zstd);"
 ```
 
 #### Generate Low Emission Zone and Limited Traffic Zone GeoJSON

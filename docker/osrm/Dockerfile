@@ -1,7 +1,5 @@
-# Modified from Docker file from OSRM to use Lua 5.3 in place of 5.4
-# Beacause lua-sql-postgres not capataible with lua-redis Lua 5.4 in debian:bullseye
-# https://github.com/Project-OSRM/osrm-backend/blob/master/docker/Dockerfile-debian
-FROM debian:bookworm-slim AS builder
+# Use slim to have lua-dbi-duckdb and libduckdb
+FROM debian:sid-20260421-slim AS builder
 ARG DOCKER_TAG
 ARG BUILD_CONCURRENCY
 
@@ -16,7 +14,7 @@ RUN mkdir -p /src /opt && \
         g++ \
         gcc \
         git \
-        libboost1.81-all-dev \
+        libboost1.83-all-dev \
         libbz2-dev \
         liblua5.3-dev \
         libtbb-dev \
@@ -78,10 +76,10 @@ RUN NPROC=1 && \
 RUN apt-get update && \
     apt-get install -y --no-install-recommends --no-install-suggests \
         expat \
-        libboost-date-time1.81.0 \
-        libboost-iostreams1.81.0 \
-        libboost-program-options1.81.0 \
-        libboost-thread1.81.0 \
+        libboost-date-time1.83.0 \
+        libboost-iostreams1.83.0 \
+        libboost-program-options1.83.0 \
+        libboost-thread1.83.0 \
         liblua5.3-0 \
         libtbb12 && \
     rm -rf /var/lib/apt/lists/* && \
@@ -108,11 +106,13 @@ VOLUME /srv/osrm/data
 # Build
 RUN apt update && \
     apt install -y --no-install-recommends \
-        lua-sql-postgres \
+        curl \
+        duckdb \
+        lua-dbi-duckdb \
         lua-redis \
         osmium-tool \
-        wget \
-        curl
+        wget && \
+    duckdb -c "INSTALL spatial"
 
 # Runtime
 RUN apt update && \
