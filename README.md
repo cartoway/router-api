@@ -243,3 +243,9 @@ docker compose --profile=* run --rm router-demo-build
 This build of the `router-demo` submodule. The generated files are copied into the `public/` folder and served staticaly by the api service.
 
 Access the web interface, once api service lunched, with: [http://localhost:8082/route.html](http://localhost:8082/route.html)
+
+### Build all
+
+```
+docker compose config --services | grep -Ev '^(api|redis-cache)$' | xargs -o -I{} docker compose --profile=build run --rm {} build.sh
+```
