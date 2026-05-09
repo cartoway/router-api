@@ -1,6 +1,9 @@
 x-osrm: &x-osrm
   build:
     context: docker/osrm
+  environment: &x-osrm-environment
+    REDIS_HOST: osrm-build-redis
+    REDIS_PORT: 6379
   volumes:
     - ./docker/osrm/data:/srv/osrm/data
     - ./docker/osrm/profiles:/srv/osrm/profiles
@@ -22,6 +25,7 @@ services:
   osrm-car-iceland:
     <<: *x-osrm
     environment:
+      <<: *x-osrm-environment
       BASENAME: car-iceland
       PBF_URLS: http://download.geofabrik.de/europe/iceland-latest.osm.pbf http://download.geofabrik.de/europe/andorra-latest.osm.pbf
       PROFILE: /srv/osrm/profiles/car/car.lua

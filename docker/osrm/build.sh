@@ -40,6 +40,14 @@ else
     ln -s $PBF_LATESTS /srv/osrm/data/${BASENAME_PBF_DATE}
 fi
 
+PROFILE_CONFIG=`dirname ${PROFILE}`/profile-config.lua
+if [ -e "${URBAN_DENSITY_PATH}" ]; then
+    sed -i "s|^urban_density_path \?=.*|urban_density_path = '${URBAN_DENSITY_PATH}'|" ${PROFILE_CONFIG}
+fi
+if [ ! -z "${REDIS_HOST}" ] && [ ! -z ${REDIS_PORT} ]; then
+    sed -i "s|^redis_conn = assert(.*|redis_conn = assert(redis.connect('${REDIS_HOST}', ${REDIS_PORT}))|" ${PROFILE_CONFIG}
+fi
+
 osrm-extract \
     --location-dependent-data /usr/local/share/osrm/data/driving_side.geojson \
     --location-dependent-data /usr/local/share/osrm/data/maxheight.geojson \
