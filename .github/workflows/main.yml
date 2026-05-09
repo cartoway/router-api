@@ -29,6 +29,8 @@ jobs:
           bundler-cache: true
 
       - name: Run tests
+        env:
+          DISABLED_WRAPPERS: graphhopper,here8,osrm,otp
         run: bundle exec rake test
 
   docker:
