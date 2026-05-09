@@ -88,7 +88,6 @@ module RouterWrapper
         route_default: :osrm,
         params_limit: PARAMS_LIMIT,
         quotas: QUOTAS, # Only taken into account if REDIS_COUNT
-        route_default: :osrm,
         route: {
           osrm: [OSRM],
           crow: [CROW],

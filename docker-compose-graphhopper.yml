@@ -1,6 +1,7 @@
-x-gh: &x-gh
+x-graphhopper: &x-graphhopper
   build:
     context: docker/graphhopper
+  image: ghcr.io/cartoway/router-api-graphhopper:${CARTOROUTE_VERSION:-master}
   volumes:
     - ./docker/graphhopper/data:/srv/graphhopper/data
     - ./docker/graphhopper/config.yaml:/opt/app/config.yaml
@@ -9,10 +10,10 @@ x-gh: &x-gh
 services:
   api:
     depends_on:
-      - gh-car-iceland
+      - graphhopper
 
-  gh-car-iceland:
-    <<: *x-gh
+  graphhopper:
+    <<: *x-graphhopper
     environment:
       BASENAME: car-iceland
       PBF_URLS: http://download.geofabrik.de/europe/iceland-latest.osm.pbf http://download.geofabrik.de/europe/andorra-latest.osm.pbf

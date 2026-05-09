@@ -1,6 +1,7 @@
 x-otp: &x-otp
   build:
     context: docker/otp
+  image: ghcr.io/cartoway/router-api-otp:${CARTOROUTE_VERSION:-master}
   ports:
     - "7001:7000"
   volumes:
@@ -10,9 +11,9 @@ x-otp: &x-otp
 services:
   api:
     depends_on:
-      - otp-bordeaux
+      - otp
 
-  otp-bordeaux:
+  otp:
     <<: *x-otp
     environment:
       GRAPH: bordeaux

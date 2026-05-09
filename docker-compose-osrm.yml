@@ -1,6 +1,7 @@
 x-osrm: &x-osrm
   build:
     context: docker/osrm
+  image: ghcr.io/cartoway/router-api-osrm:${CARTOROUTE_VERSION:-master}
   environment: &x-osrm-environment
     REDIS_HOST: osrm-build-redis
     REDIS_PORT: 6379
@@ -20,9 +21,9 @@ x-osrm: &x-osrm
 services:
   api:
     depends_on:
-      - osrm-car-iceland
+      - osrm
 
-  osrm-car-iceland:
+  osrm:
     <<: *x-osrm
     environment:
       <<: *x-osrm-environment

@@ -35,10 +35,10 @@ module RouterWrapper
 
   CROW = Wrappers::Crow.new(CACHE)
   OSRM = Wrappers::Osrm.new(CACHE, url_time: 'http://router.project-osrm.org', url_distance: 'http://router.project-osrm.org', url_isochrone: 'http://localhost:1723', url_isodistance: 'http://localhost:1723', licence: 'ODbL', attribution: '© OpenStreetMap contributors')
-  OSRM_CAR_ICELAND = Wrappers::Osrm.new(CACHE, url_time: 'http://osrm-car-iceland:5000', url_distance: nil, url_isochrone: 'http://osrm-car-iceland:6000', url_isodistance: nil, licence: 'ODbL', attribution: '© OpenStreetMap contributors')
+  OSRM_CAR_ICELAND = Wrappers::Osrm.new(CACHE, url_time: 'http://osrm:5000', url_distance: nil, url_isochrone: 'http://osrm:6000', url_isodistance: nil, licence: 'ODbL', attribution: '© OpenStreetMap contributors')
   OTP_BORDEAUX = Wrappers::Otp.new(CACHE, url: 'http://otp:7001', router_id: 'bordeaux', licence: 'ODbL', attribution: 'Bordeaux Métropole', area: 'Bordeaux', crs: 'EPSG:2154')
   HERE8_CAR = Wrappers::Here8.new(CACHE, apikey: ENV['HERE8_APIKEY'], mode: 'car', over_400km: false)
-  GRAPHHOPPER = Wrappers::GraphHopper.new(CACHE, url: 'http://gh-car-iceland:8989', profile: 'car', licence: 'ODbL', attribution: '© OpenStreetMap contributors')
+  GRAPHHOPPER = Wrappers::GraphHopper.new(CACHE, url: 'http://graphhopper:8989', profile: 'car', licence: 'ODbL', attribution: '© OpenStreetMap contributors')
 
   PARAMS_LIMIT = { locations: 1000 }.freeze
   REDIS_COUNT = ENV['REDIS_COUNT_HOST'] && Redis.new(host: ENV['REDIS_COUNT_HOST'])
