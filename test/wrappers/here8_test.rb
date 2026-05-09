@@ -44,7 +44,7 @@ class Wrappers::Here8Test < Minitest::Test
   def test_router_disconnected
     here = RouterWrapper::HERE8_CAR
     result = here.route([[-18.90928, 47.53381], [-16.92609, 145.75843]], :time, nil, nil, 'en', true, {motorway: true, toll: true})
-    assert result[:features].empty?
+    assert_empty result[:features]
   end
 
   def test_router_no_route_point
@@ -79,7 +79,7 @@ class Wrappers::Here8Test < Minitest::Test
     result = here.matrix(vector, vector, :time, nil, nil, 'en')
     assert_equal vector.size, result[:matrix_time].size
     assert_equal vector.size, result[:matrix_time][0].size
-    assert result[:matrix_time][0].any?{ |m| m }
+    assert(result[:matrix_time][0].any?{ |m| m })
   end
 
   def test_matrix_rectangular
@@ -89,7 +89,7 @@ class Wrappers::Here8Test < Minitest::Test
     result = here.matrix(src, dst, :time, nil, nil, 'en')
     assert_equal src.size, result[:matrix_time].size
     assert_equal dst.size, result[:matrix_time][0].size
-    assert result[:matrix_time][0].any?{ |m| m }
+    assert(result[:matrix_time][0].any?{ |m| m })
   end
 
   def test_matrix_traffic
@@ -98,7 +98,7 @@ class Wrappers::Here8Test < Minitest::Test
     result = here.matrix(vector, vector, :time, nil, nil, 'en', traffic: true)
     assert_equal vector.size, result[:matrix_time].size
     assert_equal vector.size, result[:matrix_time][0].size
-    assert result[:matrix_time][0].any?{ |m| m }
+    assert(result[:matrix_time][0].any?{ |m| m })
   end
 
   # def test_matrix_truck_restriction
@@ -121,14 +121,14 @@ class Wrappers::Here8Test < Minitest::Test
     scale = stddev * rho
     x = mean + scale * Math.cos(theta)
     y = mean + scale * Math.sin(theta)
-    return x
+    x
   end
 
   def test_large_matrix_split
     # activate cache because of large matrix
     here = Wrappers::Here8.new(ActiveSupport::Cache::FileStore.new(File.join(Dir.tmpdir, 'router'), namespace: 'router', expires_in: 60 * 10), apikey: ENV['HERE8_APIKEY'], mode: 'truck', over_400km: false)
     # 101 points inside south-west(50.0,10.0) and north-east(51.0,11.0) (small zone to avoid timeout with here)
-    vector = (0..20).collect{ |i|
+    vector = (0..20).collect{ |_i|
       [
         gaussian(48.8012, 48.8012 - 48.82, method(:rand)),
         gaussian(2.3841, 2.3841 - 2.2675, method(:rand)),

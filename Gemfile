@@ -28,6 +28,7 @@ group :test do
   gem 'minitest'
   gem 'minitest-focus'
   gem 'minitest-reporters'
+  gem 'mutex_m' # Required by simplecov
   gem 'rack-test'
   gem 'simplecov', require: false
 end
