@@ -115,8 +115,8 @@ module Wrappers
     end
 
     def matrix(srcs, dsts, dimension, departure_time, arrival_time, lang, options = {})
-      srcs = srcs.collect{ |r| [r[0].round(5), r[1].round(5)] }
-      dsts = dsts.collect{ |c| [c[0].round(5), c[1].round(5)] }
+      srcs = srcs.collect{ |r| [r[0].round(6), r[1].round(6)] }
+      dsts = dsts.collect{ |c| [c[0].round(6), c[1].round(6)] }
 
       dim = dimension.to_s.split('_').collect(&:to_sym)
 

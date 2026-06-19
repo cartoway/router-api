@@ -222,7 +222,7 @@ module Wrappers
           }
         else
           uri = ::Addressable::URI.parse(@url_matrix[dim1])
-          uri.path = '/table/v1/driving/polyline(' + Polylines::Encoder.encode_points(locs_uniq, 1e5) + ')'
+          uri.path = '/table/v1/driving/polyline6(' + Polylines::Encoder.encode_points(locs_uniq, 1e6) + ')'
           request = RestClient::Request.execute(
             method: :get,
             url: "#{uri.normalize.to_str}?#{params.delete_if { |k, v| v.nil? || v == '' }.to_query}",
