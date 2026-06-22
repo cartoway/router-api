@@ -120,10 +120,11 @@ module Wrappers
             large_light_vehicle? && options[:large_light_vehicle] == false ? 'notForLargeVehicule' : nil,
           ].compact).join(','),
         }.delete_if { |k, v| v.nil? || v == '' }
-        coordinates = locs.collect{ |loc| ['%f' % loc[1], '%f' % loc[0]].join(',') }.join(';')
+        uri = ::Addressable::URI.parse(@url_trace[dimension])
+        uri.path = '/route/v1/driving/polyline6(' + Polylines::Encoder.encode_points(locs, 1e6) + ')'
         request = RestClient::Request.execute(
           method: :get,
-          url: "#{@url_trace[dimension]}/route/v1/driving/#{coordinates}?#{params.to_query}",
+          url: "#{uri.normalize.to_str}?#{params.to_query}",
           open_timeout: TIMEOUT_DEFAULT_OPEN,
           read_timeout: TIMEOUT_DEFAULT,
           payload: { accept: :json }
