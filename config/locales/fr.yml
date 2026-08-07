@@ -26,3 +26,7 @@ fr:
       name: OpenTripPlanner
     here8:
       name: HERE v8
+    graphhopper_bike:
+      name: Vélo
+    graphhopper_ebike:
+      name: Vélo à assistance électrique

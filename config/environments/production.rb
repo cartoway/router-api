@@ -25,6 +25,7 @@ require './wrappers/osrm'
 require './wrappers/otp'
 require './wrappers/here8'
 require './wrappers/graphhopper'
+require './wrappers/proxy'
 
 require './lib/cache_manager'
 
@@ -38,7 +39,9 @@ module RouterWrapper
   OSRM_CAR_ICELAND = Wrappers::Osrm.new(CACHE, url_time: 'http://osrm:5000', url_distance: nil, url_isochrone: 'http://osrm:6000', url_isodistance: nil, licence: 'ODbL', attribution: '© OpenStreetMap contributors')
   OTP_BORDEAUX = Wrappers::Otp.new(CACHE, url: 'http://otp:7001', router_id: 'bordeaux', licence: 'ODbL', attribution: 'Bordeaux Métropole', area: 'Bordeaux', crs: 'EPSG:2154')
   HERE8_CAR = Wrappers::Here8.new(CACHE, apikey: ENV['HERE8_APIKEY'], mode: 'car', over_400km: false)
-  GRAPHHOPPER = Wrappers::GraphHopper.new(CACHE, url: 'http://graphhopper:8989', profile: 'car', licence: 'ODbL', attribution: '© OpenStreetMap contributors')
+  GRAPHHOPPER_CAR = Wrappers::GraphHopper.new(CACHE, url: 'http://graphhopper:8989', profile: 'car', licence: 'ODbL', attribution: '© OpenStreetMap contributors')
+  GRAPHHOPPER_BIKE = Wrappers::GraphHopper.new(CACHE, url: 'http://graphhopper:8989', profile: 'bike', licence: 'ODbL', attribution: '© OpenStreetMap contributors')
+  GRAPHHOPPER_EBIKE = Wrappers::Proxy.new(CACHE, wrapper: GRAPHHOPPER_BIKE, speed_multiplier: 1.3)
 
   PARAMS_LIMIT = { locations: 1000 }.freeze
   REDIS_COUNT = ENV['REDIS_COUNT_HOST'] && Redis.new(host: ENV['REDIS_COUNT_HOST'])
@@ -72,16 +75,22 @@ module RouterWrapper
           osrm: [OSRM_CAR_ICELAND, OSRM],
           otp: [OTP_BORDEAUX],
           here8: [HERE8_CAR],
+          graphhopper_bike: [GRAPHHOPPER_BIKE],
+          graphhopper_ebike: [GRAPHHOPPER_EBIKE],
         },
         matrix: {
           osrm: [OSRM_CAR_ICELAND, OSRM],
           otp: [OTP_BORDEAUX],
           here8: [HERE8_CAR],
+          graphhopper_bike: [GRAPHHOPPER_BIKE],
+          graphhopper_ebike: [GRAPHHOPPER_EBIKE],
         },
         isoline: {
           osrm: [OSRM_CAR_ICELAND, OSRM],
           otp: [OTP_BORDEAUX],
           here8: [HERE8_CAR],
+          graphhopper_bike: [GRAPHHOPPER_BIKE],
+          graphhopper_ebike: [GRAPHHOPPER_EBIKE],
         }
       }
     },
