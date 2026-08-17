@@ -1,8 +1,8 @@
 diff --git a/include/engine/douglas_peucker.hpp b/include/engine/douglas_peucker.hpp
-index 2be14a1ab..4d3b9d9cd 100644
+index fcdd5a60d..dbf74be3e 100644
 --- a/include/engine/douglas_peucker.hpp
 +++ b/include/engine/douglas_peucker.hpp
-@@ -31,7 +31,7 @@ inline std::vector<std::uint64_t> generateThreshold(double min_pixel, unsigned n
+@@ -33,7 +33,7 @@ inline std::vector<std::uint64_t> generateThreshold(double min_pixel, unsigned n
      return thresholds;
  }
  
@@ -11,7 +11,7 @@ index 2be14a1ab..4d3b9d9cd 100644
      49438476562500, // z0
      12359619140625, // z1
      3089903027344,  // z2
-@@ -51,6 +51,7 @@ const constexpr std::uint64_t DOUGLAS_PEUCKER_THRESHOLDS[19] = {
+@@ -53,6 +53,7 @@ const constexpr std::uint64_t DOUGLAS_PEUCKER_THRESHOLDS[19] = {
      11449,          // z16
      2809,           // z17
      676,            // z18
