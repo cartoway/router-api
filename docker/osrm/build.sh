@@ -53,6 +53,7 @@ osrm-extract \
     --location-dependent-data /usr/local/share/osrm/data/maxheight.geojson \
     --location-dependent-data /usr/local/share/osrm/data/low_emission_zone.geojson \
     --location-dependent-data /usr/local/share/osrm/data/limited_traffic_zone.geojson \
+    --location-dependent-data /usr/local/share/osrm/data/speed_adjustement_zone.geojson \
     --with-osm-metadata \
     -p ${PROFILE} \
     /srv/osrm/data/${BASENAME_PBF_DATE}

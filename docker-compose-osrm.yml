@@ -11,6 +11,7 @@ x-osrm: &x-osrm
     - ./docker/osrm/landuses:/landuses
     - ./docker/osrm/low_emission_zone.geojson:/usr/local/share/osrm/data/low_emission_zone.geojson
     - ./docker/osrm/limited_traffic_zone.geojson:/usr/local/share/osrm/data/limited_traffic_zone.geojson
+    - ./docker/osrm/speed_adjustement_zone_none.geojson:/usr/local/share/osrm/data/speed_adjustement_zone.geojson
     - /dev/log:/dev/log
   depends_on:
     osrm-build-redis:
