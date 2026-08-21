@@ -35,7 +35,6 @@ services:
         npm install && \
         npm run build && \
         mv dist/index.html dist/route.html && \
-        cp -r dist/* ../public/ && \
         patch -R vite.config.ts < ../config/router-demo.vite.patch\
       "
 
