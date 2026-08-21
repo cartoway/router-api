@@ -41,10 +41,10 @@ else
 fi
 
 PROFILE_CONFIG=`dirname ${PROFILE}`/profile-config.lua
-if [ -e "${URBAN_DENSITY_PATH}" ]; then
+if [ -e  "${PROFILE_CONFIG}" ] && -e "${URBAN_DENSITY_PATH}" ]; then
     sed -i "s|^urban_density_path \?=.*|urban_density_path = '${URBAN_DENSITY_PATH}'|" ${PROFILE_CONFIG}
 fi
-if [ ! -z "${REDIS_HOST}" ] && [ ! -z ${REDIS_PORT} ]; then
+if [ -e  "${PROFILE_CONFIG}" ] && [ ! -z "${REDIS_HOST}" ] && [ ! -z ${REDIS_PORT} ]; then
     sed -i "s|^redis_conn = assert(.*|redis_conn = assert(redis.connect('${REDIS_HOST}', ${REDIS_PORT}))|" ${PROFILE_CONFIG}
 fi
 
