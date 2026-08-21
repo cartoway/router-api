@@ -7,6 +7,7 @@ services:
     volumes:
       - .:/srv/app
       - ./router-demo/dist:/srv/app/public
+      - ./router-demo/.env.js:/srv/app/public/env.js:ro
       - ./docker/access.rb:/srv/app/config/access.rb
       - ./docker/production.rb:/srv/app/config/environments/production.rb
       - ./docker/production.rb:/srv/app/config/environments/development.rb
