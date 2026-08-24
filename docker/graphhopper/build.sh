@@ -48,3 +48,6 @@ java \
 
 rm -fr /srv/graphhopper/data/${BASENAME_PBF_LATEST%.osm.pbf}.osm-gh
 ln -s ${BASENAME_PBF_DATE%.osm.pbf}.osm-gh /srv/graphhopper/data/${BASENAME_PBF_LATEST%.osm.pbf}.osm-gh
+
+echo "Remove old versions of the data"
+find /srv/graphhopper/data -maxdepth 1 -type f -name '*-20??????.*' ! -name "*-${DATE}.*" -delete

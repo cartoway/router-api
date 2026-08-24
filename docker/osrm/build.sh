@@ -70,3 +70,6 @@ fi
 
 rm -fr /srv/osrm/data/${BASENAME_PBF_LATEST%.osm.pbf}.osrm.timestamp
 ln -s ${BASENAME_PBF_DATE%.osm.pbf}.osrm.timestamp /srv/osrm/data/${BASENAME_PBF_LATEST%.osm.pbf}.osrm.timestamp
+
+echo "Remove old versions of the data"
+find /srv/osrm/data -maxdepth 1 -type f -name '*-20??????.*' ! -name "*-${DATE}.*" -delete
