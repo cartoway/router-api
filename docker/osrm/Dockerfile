@@ -198,7 +198,7 @@ ENV OSRM_ISOCHRONE_VERSION ${OSRM_ISOCHRONE_VERSION:-26.6.0}
 # Install osrm-isochrone-server
 RUN echo "{\"name\":\"install\",\"dependencies\":{\"@project-osrm/osrm\":\"file:/src\",\"osrm-isochrone-server\":\"git+https://github.com/cartoway/osrm-isochrone-server.git#v${OSRM_ISOCHRONE_VERSION}\"}}" > package.json && \
     cp /usr/bin/echo /usr/bin/husky && \
-    npm install --legacy-peer-deps && \
+    npm install --allow-git=all && \
     npm link /src
 
 # Services part
