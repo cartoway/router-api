@@ -41,7 +41,7 @@ else
 fi
 
 PROFILE_CONFIG=`dirname ${PROFILE}`/profile-config.lua
-if [ -e  "${PROFILE_CONFIG}" ] && -e "${URBAN_DENSITY_PATH}" ]; then
+if [ -e  "${PROFILE_CONFIG}" ] && [ -e "${URBAN_DENSITY_PATH}" ]; then
     sed -i "s|^urban_density_path \?=.*|urban_density_path = '${URBAN_DENSITY_PATH}'|" ${PROFILE_CONFIG}
 fi
 if [ -e  "${PROFILE_CONFIG}" ] && [ ! -z "${REDIS_HOST}" ] && [ ! -z ${REDIS_PORT} ]; then
@@ -59,17 +59,14 @@ osrm-extract \
     /srv/osrm/data/${BASENAME_PBF_DATE}
 
 if [ "$ALGORITHM" == "ch" ]; then
-    osrm-contract \
-        /srv/osrm/data/${BASENAME_PBF_DATE%.osm.pbf}.osrm
+    osrm-contract /srv/osrm/data/${BASENAME_PBF_DATE%.osm.pbf}.osrm
 else
-    osrm-partition \
-        /srv/osrm/data/${BASENAME_PBF_DATE%.osm.pbf}.osrm
-    osrm-customize \
-        /srv/osrm/data/${BASENAME_PBF_DATE%.osm.pbf}.osrm
+    osrm-partition /srv/osrm/data/${BASENAME_PBF_DATE%.osm.pbf}.osrm
+    osrm-customize /srv/osrm/data/${BASENAME_PBF_DATE%.osm.pbf}.osrm
 fi
 
 rm -fr /srv/osrm/data/${BASENAME_PBF_LATEST%.osm.pbf}.osrm.timestamp
 ln -s ${BASENAME_PBF_DATE%.osm.pbf}.osrm.timestamp /srv/osrm/data/${BASENAME_PBF_LATEST%.osm.pbf}.osrm.timestamp
 
 echo "Remove old versions of the data"
-find /srv/osrm/data -maxdepth 1 -type f -name '*-20??????.*' ! -name "*-${DATE}.*" -delete
+find /srv/osrm/data -maxdepth 1 -type f -name "${BASENAME}-20??????.*" ! -name "${BASENAME}-${DATE}.*" -delete
