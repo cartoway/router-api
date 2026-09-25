@@ -112,13 +112,7 @@ module Wrappers
           continue_straight: false,
           generate_hints: false,
           approaches: options[:approach] == :curb ? (['curb'] * locs.size).join(';') : nil,
-          exclude: (@exclude + [
-            toll? && options[:toll] == false ? 'toll' : nil,
-            motorway? && options[:motorway] == false ? 'motorway' : nil,
-            track? && options[:track] == false ? 'track' : nil,
-            low_emission_zone? && options[:low_emission_zone] == false ? 'lowEmissionZone' : nil,
-            large_light_vehicle? && options[:large_light_vehicle] == false ? 'notForLargeVehicule' : nil,
-          ].compact).join(','),
+          exclude: excludes(options),
         }.delete_if { |k, v| v.nil? || v == '' }
         uri = ::Addressable::URI.parse(@url_trace[dimension])
         uri.path = '/route/v1/driving/polyline6(' + Polylines::Encoder.encode_points(locs, 1e6) + ')'
@@ -199,7 +193,7 @@ module Wrappers
       if !json
         concern = {
           annotations: ([[dim1, dim2].include?(:time) ? 'duration' : nil] + [[dim1, dim2].include?(:distance) ? 'distance' : nil]).compact.join(','),
-          exclude: (@exclude + [options[:toll] == false ? 'toll' : nil, options[:motorway] == false ? 'motorway' : nil, options[:track] == false ? 'track' : nil, options[:large_light_vehicle] == false ? 'notForLargeVehicule' : nil, options[:low_emission_zone] == false ? 'lowEmissionZone' : nil].compact).join(',')
+          exclude: excludes(options),
         }
 
         if srcs == dsts
@@ -305,6 +299,8 @@ module Wrappers
       end
     end
 
+    private:
+
     def distance_by_way_type(route, precision)
       regrouped_classes = regroup_by_way_type(route, precision)
       available_classes = regrouped_classes.collect{ |g| {way_type: g[:way_type], distance: 0} }.uniq
@@ -383,6 +379,16 @@ module Wrappers
 
     def same_coordinates?(one, other, precision)
       one.collect{ |l| l.round(precision) } == other.collect{ |l| l.round(precision) }
+    end
+
+    def excludes
+      (@exclude + [
+        toll? && options[:toll] == false ? 'toll' : nil,
+        motorway? && options[:motorway] == false ? 'motorway' : nil,
+        track? && options[:track] == false ? 'track' : nil,
+        low_emission_zone? && options[:low_emission_zone] == false ? 'lowEmissionZone' : nil,
+        large_light_vehicle? && options[:large_light_vehicle] == false ? 'notForLargeVehicule' : nil,
+      ].compact).join(',')
     end
   end
 end
