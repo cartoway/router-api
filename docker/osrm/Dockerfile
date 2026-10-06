@@ -39,9 +39,8 @@ WORKDIR /src
 COPY fixed-zoom-level-simplification.diff .
 RUN git apply fixed-zoom-level-simplification.diff
 
-# COPY max_class.diff .
-# RUN git apply max_class.diff
-
+COPY exclude-class-15.diff .
+RUN git apply exclude-class-15.diff
 
 # NOTE: VCPKG_ROOT lives outside /opt so the runstage's COPY --from=builder /opt
 # /opt doesn't drag the ~5 GB vcpkg tree along.
