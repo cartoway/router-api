@@ -1,6 +1,8 @@
 source 'https://rubygems.org'
 ruby '>= 3'
 
+gem 'base64' # Indirect dependency, but need it here
+
 gem 'puma'
 gem 'rack'
 gem 'rack-cors'
@@ -18,6 +20,7 @@ gem 'activesupport'
 gem 'addressable'
 gem 'border_patrol'
 gem 'i18n'
+gem 'mutex_m'
 gem 'rack-contrib'
 gem 'rest-client'
 
@@ -28,7 +31,6 @@ group :test do
   gem 'minitest'
   gem 'minitest-focus'
   gem 'minitest-reporters'
-  gem 'mutex_m' # Required by simplecov
   gem 'rack-test'
   gem 'simplecov', require: false
 end
