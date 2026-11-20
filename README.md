@@ -209,14 +209,14 @@ Add the file at `docker/osrm/low_emission_zone.geojson` and `docker/osrm/limited
 
 #### Build the graph
 ```
-docker compose --profile=build up -d osrm-build-postgis osrm-build-redis
+docker compose --profile=build up -d osrm-build-redis
 docker compose --profile=build run --rm osrm build.sh
 ```
 
-After the build process `osrm-build-postgis` and `osrm-build-redis` could be stoped.
+After the build process `osrm-build-redis` could be stoped.
 ```
 docker compose --profile=build exec osrm-build-redis redis-cli SAVE
-docker compose --profile=build down osrm-build-postgis osrm-build-redis
+docker compose --profile=build down osrm-build-redis
 ```
 
 ### GraphHopper
