@@ -38,6 +38,9 @@ services:
     profiles:
       - build
     image: redis:${REDIS_VERSION:-8-alpine}
+    command: redis-server --save ""
+    volumes:
+      - osrm-build-redis-data:/data
     healthcheck:
       test: redis-cli --raw incr ping
       start_interval: 1s
@@ -45,3 +48,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+
+volumes:
+  osrm-build-redis-data:
