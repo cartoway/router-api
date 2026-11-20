@@ -39,7 +39,7 @@ services:
       "
 
   redis-cache:
-    image: redis:${REDIS_VERSION:-7-alpine}
+    image: redis:${REDIS_VERSION:-8-alpine}
     command: redis-server --save ""
     healthcheck:
       test: redis-cli --raw incr ping
