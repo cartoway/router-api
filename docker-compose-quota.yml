@@ -6,7 +6,7 @@ services:
       REDIS_COUNT_HOST: redis-count
 
   redis-count:
-    image: redis:${REDIS_VERSION:-7-alpine}
+    image: redis:${REDIS_VERSION:-8-alpine}
     volumes:
       - ./docker/redis-count:/data
     command: redis-server --appendonly yes

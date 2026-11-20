@@ -37,7 +37,7 @@ services:
   osrm-build-redis:
     profiles:
       - build
-    image: redis:${REDIS_VERSION:-7-alpine}
+    image: redis:${REDIS_VERSION:-8-alpine}
     healthcheck:
       test: redis-cli --raw incr ping
       start_interval: 1s
